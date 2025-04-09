@@ -14,5 +14,5 @@ En esta primera unidad, se llevará a cabo la implementación de las siguientes 
 Este entregable incluirá la creación de las funcionalidades necesarias para que el usuario pueda definir y gestionar estos elementos estratégicos de forma sencilla. La implementación estará enfocada en la entrada y consulta de los datos por parte del usuario.
 
 ## Tecnologías utilizadas
-- **Lenguaje de programación:** PHP
+- **Lenguaje de programación:** PHP.
 - **Base de datos:** MySQL
