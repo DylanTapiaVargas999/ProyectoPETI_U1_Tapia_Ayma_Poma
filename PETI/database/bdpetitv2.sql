@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Versión del servidor:         10.4.27-MariaDB - mariadb.org binary distribution
+-- Versión del servidor:         10.4.32-MariaDB - mariadb.org binary distribution
 -- SO del servidor:              Win64
--- HeidiSQL Versión:             12.4.0.6659
+-- HeidiSQL Versión:             12.6.0.6765
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -23,8 +23,8 @@ USE `bd_plan`;
 CREATE TABLE IF NOT EXISTS `afrontar` (
   `id_afrontar` int(11) NOT NULL AUTO_INCREMENT,
   `afrontar` varchar(255) NOT NULL,
-  `id_usuario` int(11) DEFAULT NULL,
   `codigo` varchar(10) NOT NULL,
+  `id_usuario` int(11) DEFAULT NULL,
   PRIMARY KEY (`id_afrontar`),
   KEY `id_usuario` (`id_usuario`),
   CONSTRAINT `afrontar_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`)
@@ -36,8 +36,8 @@ CREATE TABLE IF NOT EXISTS `afrontar` (
 CREATE TABLE IF NOT EXISTS `amenaza` (
   `id_amenaza` int(11) NOT NULL AUTO_INCREMENT,
   `amenaza` varchar(255) NOT NULL,
-  `id_usuario` int(11) DEFAULT NULL,
   `codigo` varchar(10) NOT NULL,
+  `id_usuario` int(11) DEFAULT NULL,
   PRIMARY KEY (`id_amenaza`),
   KEY `id_usuario` (`id_usuario`),
   CONSTRAINT `amenaza_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`)
@@ -49,8 +49,8 @@ CREATE TABLE IF NOT EXISTS `amenaza` (
 CREATE TABLE IF NOT EXISTS `corregir` (
   `id_corregir` int(11) NOT NULL AUTO_INCREMENT,
   `corregir` varchar(255) NOT NULL,
-  `id_usuario` int(11) DEFAULT NULL,
   `codigo` varchar(10) NOT NULL,
+  `id_usuario` int(11) DEFAULT NULL,
   PRIMARY KEY (`id_corregir`),
   KEY `id_usuario` (`id_usuario`),
   CONSTRAINT `corregir_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`)
@@ -62,8 +62,8 @@ CREATE TABLE IF NOT EXISTS `corregir` (
 CREATE TABLE IF NOT EXISTS `debilidad` (
   `id_debilidad` int(11) NOT NULL AUTO_INCREMENT,
   `debilidad` varchar(255) NOT NULL,
-  `id_usuario` int(11) DEFAULT NULL,
   `codigo` varchar(10) NOT NULL,
+  `id_usuario` int(11) DEFAULT NULL,
   PRIMARY KEY (`id_debilidad`),
   KEY `id_usuario` (`id_usuario`),
   CONSTRAINT `debilidad_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`)
@@ -75,8 +75,8 @@ CREATE TABLE IF NOT EXISTS `debilidad` (
 CREATE TABLE IF NOT EXISTS `estrategia` (
   `id_estrategia` int(11) NOT NULL AUTO_INCREMENT,
   `estrategia` varchar(255) NOT NULL,
-  `id_usuario` int(11) DEFAULT NULL,
   `codigo` varchar(10) NOT NULL,
+  `id_usuario` int(11) DEFAULT NULL,
   PRIMARY KEY (`id_estrategia`),
   KEY `id_usuario` (`id_usuario`),
   CONSTRAINT `estrategia_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`)
@@ -88,8 +88,8 @@ CREATE TABLE IF NOT EXISTS `estrategia` (
 CREATE TABLE IF NOT EXISTS `explotar` (
   `id_explotar` int(11) NOT NULL AUTO_INCREMENT,
   `explotar` varchar(255) NOT NULL,
-  `id_usuario` int(11) DEFAULT NULL,
   `codigo` varchar(10) NOT NULL,
+  `id_usuario` int(11) DEFAULT NULL,
   PRIMARY KEY (`id_explotar`),
   KEY `id_usuario` (`id_usuario`),
   CONSTRAINT `explotar_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`)
@@ -101,8 +101,8 @@ CREATE TABLE IF NOT EXISTS `explotar` (
 CREATE TABLE IF NOT EXISTS `fortaleza` (
   `id_fortaleza` int(11) NOT NULL AUTO_INCREMENT,
   `fortaleza` varchar(255) NOT NULL,
-  `id_usuario` int(11) DEFAULT NULL,
   `codigo` varchar(10) NOT NULL,
+  `id_usuario` int(11) DEFAULT NULL,
   PRIMARY KEY (`id_fortaleza`),
   KEY `id_usuario` (`id_usuario`),
   CONSTRAINT `fortaleza_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`)
@@ -114,8 +114,8 @@ CREATE TABLE IF NOT EXISTS `fortaleza` (
 CREATE TABLE IF NOT EXISTS `mantener` (
   `id_mantener` int(11) NOT NULL AUTO_INCREMENT,
   `mantener` varchar(255) NOT NULL,
-  `id_usuario` int(11) DEFAULT NULL,
   `codigo` varchar(10) NOT NULL,
+  `id_usuario` int(11) DEFAULT NULL,
   PRIMARY KEY (`id_mantener`),
   KEY `id_usuario` (`id_usuario`),
   CONSTRAINT `mantener_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`)
@@ -127,12 +127,12 @@ CREATE TABLE IF NOT EXISTS `mantener` (
 CREATE TABLE IF NOT EXISTS `mision` (
   `id_mision` int(11) NOT NULL AUTO_INCREMENT,
   `mision` varchar(255) NOT NULL,
-  `id_usuario` int(11) DEFAULT NULL,
   `codigo` varchar(10) NOT NULL,
+  `id_usuario` int(11) DEFAULT NULL,
   PRIMARY KEY (`id_mision`),
   KEY `id_usuario` (`id_usuario`),
   CONSTRAINT `mision_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- La exportación de datos fue deseleccionada.
 
@@ -140,8 +140,8 @@ CREATE TABLE IF NOT EXISTS `mision` (
 CREATE TABLE IF NOT EXISTS `objetivo_especifico` (
   `id_especifico` int(11) NOT NULL AUTO_INCREMENT,
   `objetivo` varchar(255) NOT NULL,
-  `id_general` int(11) DEFAULT NULL,
   `codigo` varchar(10) NOT NULL,
+  `id_general` int(11) DEFAULT NULL,
   PRIMARY KEY (`id_especifico`),
   KEY `id_general` (`id_general`),
   CONSTRAINT `objetivo_especifico_ibfk_1` FOREIGN KEY (`id_general`) REFERENCES `objetivo_general` (`id_general`)
@@ -153,8 +153,8 @@ CREATE TABLE IF NOT EXISTS `objetivo_especifico` (
 CREATE TABLE IF NOT EXISTS `objetivo_general` (
   `id_general` int(11) NOT NULL AUTO_INCREMENT,
   `objetivo` varchar(255) NOT NULL,
-  `id_usuario` int(11) DEFAULT NULL,
   `codigo` varchar(10) NOT NULL,
+  `id_usuario` int(11) DEFAULT NULL,
   PRIMARY KEY (`id_general`),
   KEY `id_usuario` (`id_usuario`),
   CONSTRAINT `objetivo_general_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`)
@@ -177,14 +177,14 @@ CREATE TABLE IF NOT EXISTS `oportunidad` (
 
 -- Volcando estructura para tabla bd_plan.plan_estrategico
 CREATE TABLE IF NOT EXISTS `plan_estrategico` (
-  `id` int(8) NOT NULL DEFAULT 0,
+  `id` int(8) NOT NULL AUTO_INCREMENT,
   `codigo` varchar(10) NOT NULL DEFAULT '0',
   `titulo` varchar(200) NOT NULL,
   `id_usuario` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `FK__usuario` (`id_usuario`),
   CONSTRAINT `FK__usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- La exportación de datos fue deseleccionada.
 
@@ -192,8 +192,8 @@ CREATE TABLE IF NOT EXISTS `plan_estrategico` (
 CREATE TABLE IF NOT EXISTS `uen` (
   `id_uen` int(11) NOT NULL AUTO_INCREMENT,
   `uen` varchar(255) NOT NULL,
-  `id_usuario` int(11) DEFAULT NULL,
   `codigo` varchar(10) NOT NULL,
+  `id_usuario` int(11) DEFAULT NULL,
   PRIMARY KEY (`id_uen`),
   KEY `id_usuario` (`id_usuario`),
   CONSTRAINT `uen_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`)
@@ -212,7 +212,7 @@ CREATE TABLE IF NOT EXISTS `usuario` (
   `imagen` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_correo` (`correo`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- La exportación de datos fue deseleccionada.
 
@@ -220,8 +220,8 @@ CREATE TABLE IF NOT EXISTS `usuario` (
 CREATE TABLE IF NOT EXISTS `valores` (
   `id_valor` int(11) NOT NULL AUTO_INCREMENT,
   `valor` varchar(255) NOT NULL,
-  `id_usuario` int(11) DEFAULT NULL,
   `codigo` varchar(10) NOT NULL,
+  `id_usuario` int(11) DEFAULT NULL,
   PRIMARY KEY (`id_valor`),
   KEY `id_usuario` (`id_usuario`),
   CONSTRAINT `valores_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`)
@@ -233,8 +233,8 @@ CREATE TABLE IF NOT EXISTS `valores` (
 CREATE TABLE IF NOT EXISTS `vision` (
   `id_vision` int(11) NOT NULL AUTO_INCREMENT,
   `vision` varchar(255) NOT NULL,
-  `id_usuario` int(11) DEFAULT NULL,
   `codigo` varchar(10) NOT NULL,
+  `id_usuario` int(11) DEFAULT NULL,
   PRIMARY KEY (`id_vision`),
   KEY `id_usuario` (`id_usuario`),
   CONSTRAINT `vision_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`)

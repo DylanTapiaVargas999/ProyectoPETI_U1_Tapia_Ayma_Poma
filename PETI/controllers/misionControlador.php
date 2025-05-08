@@ -4,7 +4,6 @@ require_once 'models/mision.php';
 class misionControlador {
 
     public function index() {
-        // Verifica si el usuario está logueado
         if (!isset($_SESSION['identity'])) {
             header("Location:" . base_url . "usuario/iniciarSesion");
             exit();
@@ -20,22 +19,25 @@ class misionControlador {
     public function guardar() {
         if (isset($_POST) && isset($_SESSION['identity'])) {
             $textoMision = isset($_POST['mision']) ? $_POST['mision'] : null;
-
-            if ($textoMision) {
+            $codigo = isset($_SESSION['codigo_plan']) ? $_SESSION['codigo_plan'] : null;
+    
+            if ($textoMision && $codigo) {
                 $nuevaMision = new Mision();
                 $nuevaMision->setMision($textoMision);
+                $nuevaMision->setCodigo($codigo);
                 $nuevaMision->setIdUsuario($_SESSION['identity']->id);
-
+    
                 $guardado = $nuevaMision->guardar();
-
+    
                 $_SESSION['mision_guardada'] = $guardado ? 'completado' : 'fallido';
             } else {
                 $_SESSION['mision_guardada'] = 'fallido';
             }
         }
-
+    
         header("Location:" . base_url . "mision/index");
     }
+    
 
     public function eliminar() {
         if (isset($_GET['id']) && isset($_SESSION['identity'])) {
@@ -80,17 +82,21 @@ class misionControlador {
         if (isset($_POST) && isset($_SESSION['identity'])) {
             $id_mision = isset($_POST['id_mision']) ? (int) $_POST['id_mision'] : null;
             $textoMision = isset($_POST['mision']) ? $_POST['mision'] : null;
+            $codigo = isset($_POST['codigo']) ? $_POST['codigo'] : null;
             $id_usuario = $_SESSION['identity']->id;
 
-            if ($id_mision && $textoMision) {
+            if ($id_mision && $textoMision && $codigo) {
                 $mision = new Mision();
                 $mision->setIdMision($id_mision);
                 $mision->setMision($textoMision);
+                $mision->setCodigo($codigo);
                 $mision->setIdUsuario($id_usuario);
 
                 $actualizado = $mision->actualizar();
 
                 $_SESSION['mision_actualizada'] = $actualizado ? 'completado' : 'fallido';
+            } else {
+                $_SESSION['mision_actualizada'] = 'fallido';
             }
         }
 

@@ -6,7 +6,7 @@ class usuarioControlador {
     public $estaLogueado;
     
     public function index(){
-        echo "Controlador de Usuario, Acción index";
+        echo "Controlador de Usuario, Acción indekjhx";
         require_once 'index.php';
     }
 
@@ -57,23 +57,26 @@ class usuarioControlador {
             $usuario = new Usuario();
             $usuario->setCorreo($_POST['correo-login']);
             $usuario->setClave($_POST['clave']);
-            
+    
             $identidad = $usuario->iniciarSesion();
-
+    
             // Crear sesión para mantener al usuario logueado
             if($identidad && is_object($identidad)){
                 $_SESSION['identity'] = $identidad;
-                header("Location:".base_url);
-
+    
                 if($identidad->rol == 'admin'){
                     $_SESSION['admin'] = true;
                 }
+    
+                // 🔁 Redirige directamente al CRUD de planes estratégicos
+                header("Location:".base_url."?controlador=planEstrategico&accion=index");
             } else {
                 $_SESSION['error_login'] = 'Falló la identificación';
                 echo '¡Falló la identificación!';
             }
         }
     }
+    
 
     public function perfil(){
         // 1. Verifica si el usuario ha iniciado sesión

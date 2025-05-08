@@ -48,7 +48,11 @@
 
     <form action="<?= base_url ?>mision/actualizar" method="POST">
         <input type="hidden" name="id_mision" value="<?= $misionActual->id_mision ?>">
+        <input type="hidden" name="codigo" value="<?= $misionActual->codigo ?>">
+        
         <textarea name="mision" required><?= htmlspecialchars($misionActual->mision) ?></textarea>
+        
         <button type="submit">Guardar cambios</button>
     </form>
+
 </div>

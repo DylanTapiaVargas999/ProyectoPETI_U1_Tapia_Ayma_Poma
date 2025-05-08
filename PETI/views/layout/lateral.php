@@ -23,6 +23,17 @@
         
         <!-- CONTENIDO DEL MENÚ -->
         <div class="menu-container">
+
+             <!-- Sección Fundamentos -->
+            <div class="menu-section">
+                    <h3 class="menu-title">Plan Estrategico</h3>
+                    <ul class="menu-list">
+                        <li class="menu-item">
+                            <i class="fas fa-table"></i>
+                            <a href="<?=base_url?>planEstrategico/index">Gestion de Plan Estrategico</a>
+                        </li>
+                    </ul>
+                </div>
             <!-- Sección Fundamentos -->
             <div class="menu-section">
                 <h3 class="menu-title">Fundamentos</h3>
