@@ -7,9 +7,31 @@
     <link rel="stylesheet" href="<?=base_url?>assets/css/layout/lateral.css">
     <link rel="stylesheet" href="<?=base_url?>assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
-
+        .selected-plan {
+            font-size: 0.9rem;
+            color: #f0f0f0;
+            margin-top: 8px;
+            padding: 5px 10px;
+            background-color: #333;
+            border-radius: 5px;
+        }
+        .text-warning {
+            color: #ffc107;
+        }
+        .btn-change-plan {
+            margin-top: 10px;
+            padding: 5px 10px;
+            font-size: 0.9rem;
+            background-color: #ff5722;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn-change-plan:hover {
+            background-color: #e64a19;
+        }
     </style>
 </head>
 <body>
@@ -19,21 +41,28 @@
         <div class="sidebar-header">
             <h2>Estrategia Corporativa</h2>
             <span class="plan-badge">PETI</span>
+            
+            <!-- Mostrar el plan seleccionado -->
+            <?php if (isset($_SESSION['plan_codigo'])): ?>
+                <div class="selected-plan">
+                    <i class="fas fa-file-alt"></i>
+                    Plan activo: <strong><?= $_SESSION['plan_codigo'] ?></strong>
+                </div>
+                <!-- Botón para cambiar el plan -->
+                <form action="<?=base_url?>planEstrategico/cambiar" method="POST" id="form-cambiar-plan">
+                    <button type="submit" class="btn-change-plan">Cambiar Plan</button>
+                </form>
+
+            <?php else: ?>
+                <div class="selected-plan text-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    No hay plan seleccionado
+                </div>
+            <?php endif; ?>
         </div>
         
         <!-- CONTENIDO DEL MENÚ -->
         <div class="menu-container">
-
-             <!-- Sección Fundamentos -->
-            <div class="menu-section">
-                    <h3 class="menu-title">Plan Estrategico</h3>
-                    <ul class="menu-list">
-                        <li class="menu-item">
-                            <i class="fas fa-table"></i>
-                            <a href="<?=base_url?>planEstrategico/index">Gestion de Plan Estrategico</a>
-                        </li>
-                    </ul>
-                </div>
             <!-- Sección Fundamentos -->
             <div class="menu-section">
                 <h3 class="menu-title">Fundamentos</h3>
@@ -52,7 +81,7 @@
                     </li>
                     <li class="menu-item">
                         <i class="fas fa-flag-checkered"></i>
-                        <a href="<?=base_url?>objetivoGeneral/index">4. Objetivos</a>
+                        <a href="<?=base_url?>plan/index">4. Objetivos</a>
                     </li>
                 </ul>
             </div>
@@ -63,7 +92,7 @@
                 <ul class="menu-list">
                     <li class="menu-item">
                         <i class="fas fa-search"></i>
-                        <a href="#">5. Análisis FODA</a>
+                        <a href="<?=base_url?>analisis/index">5. Análisis FODA</a>
                     </li>
                     <li class="menu-item">
                         <i class="fas fa-link"></i>
@@ -120,7 +149,7 @@
                                 <i class="fas fa-user-circle"></i>
                                 <div class="user-welcome">
                                     <span class="welcome-text">Bienvenido,</span>
-                                    <span class="user-name"><?= $_SESSION['identity']->nombre ?></span>
+                                    <span class="user-name"><?= $_SESSION['identity']->empresa ?></span>
                                 </div>
                                 <i class="fas fa-chevron-down dropdown-arrow"></i>
                             </div>

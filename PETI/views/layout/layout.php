@@ -16,33 +16,14 @@
     <!-- Contenido dinámico -->
     <div class="main-content">
       <?= isset($contenido) ? $contenido : "<h1>Bienvenido a Mijo Store</h1>" ?>
+      
     </div>
   </div>
 
-  <!-- MODALES (Login y Registro) -->
-  <div id="loginModal" class="modal-container">
-    <div class="modal-content">
-      <?php require_once 'views/usuario/iniciarSesion.php'; ?>
-    </div>
-  </div>
-
-
-
-  <!-- Script para manejar los modales -->
+  <!-- Scripts -->
   <script>
-    function mostrarLogin() {
-      document.getElementById('loginModal').style.display = 'flex';
-    }
-    
-    function mostrarRegistro() {
-      document.getElementById('registroModal').style.display = 'flex';
-    }
-
-    function cerrarModales() {
-      document.getElementById('loginModal').style.display = 'none';
-      document.getElementById('registroModal').style.display = 'none';
-    }
+    // Eliminamos las funciones de modal ya que no las necesitamos
+    // Podemos mantener otros scripts necesarios para la aplicación
   </script>
-
 </body>
 </html>

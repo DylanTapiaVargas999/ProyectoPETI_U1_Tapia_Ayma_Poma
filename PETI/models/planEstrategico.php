@@ -1,5 +1,4 @@
 <?php
-require_once 'config/db.php';
 
 class PlanEstrategico {
     private $id;
@@ -12,64 +11,103 @@ class PlanEstrategico {
         $this->db = Database::conexion();
     }
 
-    // Getters
     public function getId() {
         return $this->id;
+    }
+
+    public function setId($id) {
+        $this->id = $id;
+        return $this;
     }
 
     public function getCodigo() {
         return $this->codigo;
     }
 
+    public function setCodigo($codigo) {
+        $this->codigo = $this->db->real_escape_string($codigo);
+        return $this;
+    }
+
     public function getTitulo() {
         return $this->titulo;
+    }
+
+    public function setTitulo($titulo) {
+        $this->titulo = $this->db->real_escape_string($titulo);
+        return $this;
     }
 
     public function getIdUsuario() {
         return $this->id_usuario;
     }
 
-    // Setters
-    public function setId($id) {
-        $this->id = $this->db->real_escape_string($id);
-    }
-
-    public function setCodigo($codigo) {
-        $this->codigo = $this->db->real_escape_string($codigo);
-    }
-
-    public function setTitulo($titulo) {
-        $this->titulo = $this->db->real_escape_string($titulo);
-    }
-
     public function setIdUsuario($id_usuario) {
-        $this->id_usuario = $this->db->real_escape_string($id_usuario);
+        $this->id_usuario = $id_usuario;
+        return $this;
     }
 
-    // Guardar nuevo plan estratégico
     public function guardar() {
-        $sql = "INSERT INTO plan_estrategico (codigo, titulo, id_usuario)
-                VALUES ('{$this->getCodigo()}', '{$this->getTitulo()}', {$this->getIdUsuario()})";
-        return $this->db->query($sql);
+        $codigo = $this->generarCodigoUnico();
+
+        $sql = "INSERT INTO plan_estrategico VALUES(
+            NULL,
+            '$codigo',
+            '{$this->getTitulo()}',
+            {$this->getIdUsuario()}
+        )";
+
+        $guardar = $this->db->query($sql);
+        return $guardar ? true : false;
     }
 
-    // Obtener todos los planes por usuario
-    public function obtenerPorUsuario($id_usuario) {
-        $sql = "SELECT * FROM plan_estrategico WHERE id_usuario = {$this->db->real_escape_string($id_usuario)} ORDER BY id DESC";
-        return $this->db->query($sql);
+
+    public function obtenerTodosPorUsuario($idUsuario) {
+        $sql = "SELECT * FROM plan_estrategico WHERE id_usuario = $idUsuario ORDER BY id DESC";
+        $result = $this->db->query($sql);
+        return $result;
     }
 
-    // Eliminar un plan estratégico
-    public function eliminar($id) {
-        $sql = "DELETE FROM plan_estrategico WHERE id = {$this->db->real_escape_string($id)}";
-        return $this->db->query($sql);
+    public function obtenerUno($id) {
+        $sql = "SELECT * FROM plan_estrategico WHERE id = $id";
+        $result = $this->db->query($sql);
+        return $result->fetch_object();
     }
 
-    // Actualizar plan estratégico
     public function actualizar() {
-        $sql = "UPDATE plan_estrategico 
-                SET codigo = '{$this->getCodigo()}', titulo = '{$this->getTitulo()}'
-                WHERE id = {$this->getId()} AND id_usuario = {$this->getIdUsuario()}";
-        return $this->db->query($sql);
+        $sql = "UPDATE plan_estrategico SET
+                codigo = '{$this->getCodigo()}',
+                titulo = '{$this->getTitulo()}',
+                id_usuario = {$this->getIdUsuario()}
+                WHERE id = {$this->getId()}";
+
+        $actualizar = $this->db->query($sql);
+        return $actualizar ? true : false;
     }
+
+    public function eliminar() {
+        $sql = "DELETE FROM plan_estrategico WHERE id = {$this->getId()}";
+        $eliminar = $this->db->query($sql);
+        return $eliminar ? true : false;
+    }
+
+    private function generarCodigoUnico($longitud = 10) {
+        $caracteres = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $codigo = '';
+        for ($i = 0; $i < $longitud; $i++) {
+            $codigo .= $caracteres[rand(0, strlen($caracteres) - 1)];
+        }
+
+        // Verificar si ya existe en la BD
+        $sql = "SELECT id FROM plan_estrategico WHERE codigo = '$codigo'";
+        $resultado = $this->db->query($sql);
+
+        if ($resultado && $resultado->num_rows > 0) {
+            return $this->generarCodigoUnico($longitud); // Recursivo si ya existe
+        }
+
+        return $codigo;
+    }
+
+
 }

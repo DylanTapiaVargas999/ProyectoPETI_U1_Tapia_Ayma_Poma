@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Editar Perfil</title>
-    <link rel="stylesheet" href="<?=base_url?>assets/css/usuario/editarPerfil.css">
+    <link rel="stylesheet" href="<?= base_url ?>assets/css/usuario/editarPerfil.css">
 </head>
 <body>
     <div class="contenedor-editar-perfil">
-        <h1>Editar Perfil de <?= htmlspecialchars($usuario->nombre) ?></h1>
-        
+        <h1>Editar Perfil de <?= htmlspecialchars($usuario->empresa) ?></h1>
+
         <?php if (isset($_SESSION['perfil_actualizado'])): ?>
             <?php if ($_SESSION['perfil_actualizado'] == 'completado'): ?>
                 <p class="mensaje-exito">Perfil actualizado con éxito.</p>
@@ -20,12 +20,8 @@
 
         <form action="<?= base_url ?>usuario/actualizarPerfil" method="POST" enctype="multipart/form-data">
             <div class="form-group">
-                <label for="nombre">Nombre:</label>
-                <input type="text" name="nombre" id="nombre" value="<?= htmlspecialchars($usuario->nombre) ?>" required>
-            </div>
-            <div class="form-group">
-                <label for="apellido">Representante legal:</label>
-                <input type="text" name="apellido" id="apellido" value="<?= htmlspecialchars($usuario->apellido) ?>" required>
+                <label for="empresa">Empresa:</label>
+                <input type="text" name="empresa" id="empresa" value="<?= htmlspecialchars($usuario->empresa) ?>" required>
             </div>
             <div class="form-group">
                 <label for="correo">Correo Electrónico:</label>
@@ -35,7 +31,7 @@
                 <label for="imagen">Imagen de Perfil:</label>
                 <!-- Mostrar la imagen actual si existe -->
                 <?php if (!empty($usuario->imagen)): ?>
-                    <img src="<?= base_url ?>assets/img/perfiles/<?= htmlspecialchars($usuario->imagen) ?>" alt="Imagen actual de <?= htmlspecialchars($usuario->nombre) ?>" class="imagen-actual">
+                    <img src="<?= base_url ?>assets/img/perfiles/<?= htmlspecialchars($usuario->imagen) ?>" alt="Imagen actual de <?= htmlspecialchars($usuario->empresa) ?>" class="imagen-actual">
                 <?php endif; ?>
                 <input type="file" name="imagen" id="imagen" accept="image/*">
             </div>

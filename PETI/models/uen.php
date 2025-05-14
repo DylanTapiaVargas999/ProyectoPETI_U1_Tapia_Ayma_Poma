@@ -4,6 +4,7 @@ require_once 'config/db.php';
 class Uen {
     private $id_uen;
     private $uen;
+    private $codigo;
     private $id_usuario;
     private $db;
 
@@ -12,61 +13,77 @@ class Uen {
     }
 
     // Getters
-    public function getIdUen() {
-        return $this->id_uen;
-    }
-
-    public function getUen() {
-        return $this->uen;
-    }
-
-    public function getIdUsuario() {
-        return $this->id_usuario;
-    }
+    public function getIdUen() { return $this->id_uen; }
+    public function getUen() { return $this->uen; }
+    public function getCodigo() { return $this->codigo; }
+    public function getIdUsuario() { return $this->id_usuario; }
 
     // Setters
     public function setIdUen($id_uen) {
-        $this->id_uen = $this->db->real_escape_string($id_uen);
+        $this->id_uen = intval($id_uen);
+        return $this;
     }
 
     public function setUen($uen) {
-        $this->uen = $this->db->real_escape_string($uen);
+        $this->uen = $this->db->real_escape_string(trim($uen));
+        return $this;
+    }
+
+    public function setCodigo($codigo) {
+        $this->codigo = $this->db->real_escape_string(trim($codigo));
+        return $this;
     }
 
     public function setIdUsuario($id_usuario) {
-        $this->id_usuario = $this->db->real_escape_string($id_usuario);
+        $this->id_usuario = intval($id_usuario);
+        return $this;
     }
 
-    // Guardar nueva UEN
+    // CRUD Operations
     public function guardar() {
-        $sql = "INSERT INTO UEN (uen, id_usuario) VALUES ('{$this->getUen()}', {$this->getIdUsuario()})";
-        $resultado = $this->db->query($sql);
-        return $resultado;
+        if (empty($this->uen) || empty($this->codigo) || empty($this->id_usuario)) {
+            return false;
+        }
+
+        $sql = "INSERT INTO uen VALUES(NULL, ?, ?, ?)";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param('ssi', $this->uen, $this->codigo, $this->id_usuario);
+        
+        if ($stmt->execute()) {
+            $this->id_uen = $stmt->insert_id;
+            return true;
+        }
+        return false;
     }
 
-    // Obtener UENs por usuario
-    public function obtenerPorUsuario($id_usuario) {
-        $sql = "SELECT * FROM UEN WHERE id_usuario = {$this->db->real_escape_string($id_usuario)} ORDER BY id_uen DESC";
-        $result = $this->db->query($sql);
-        return $result;
+    public function obtenerPorUsuarioYPlan($id_usuario, $codigo_plan) {
+        $sql = "SELECT * FROM uen WHERE id_usuario = ? AND codigo = ? ORDER BY id_uen DESC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param('is', $id_usuario, $codigo_plan);
+        $stmt->execute();
+        return $stmt->get_result();
     }
 
-    // Obtener UEN específica por ID y usuario
-    public function obtenerPorId($id_uen, $id_usuario) {
-        $sql = "SELECT * FROM UEN WHERE id_uen = {$this->db->real_escape_string($id_uen)} AND id_usuario = {$this->db->real_escape_string($id_usuario)} LIMIT 1";
-        $result = $this->db->query($sql);
-        return $result->fetch_object();
+    public function obtenerUno($id_uen, $id_usuario) {
+        $sql = "SELECT * FROM uen WHERE id_uen = ? AND id_usuario = ? LIMIT 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param('ii', $id_uen, $id_usuario);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_object();
     }
 
-    // Eliminar UEN
-    public function eliminar($id_uen) {
-        $sql = "DELETE FROM UEN WHERE id_uen = {$this->db->real_escape_string($id_uen)}";
-        return $this->db->query($sql);
-    }
-
-    // Actualizar UEN
     public function actualizar() {
-        $sql = "UPDATE UEN SET uen = '{$this->getUen()}' WHERE id_uen = {$this->getIdUen()} AND id_usuario = {$this->getIdUsuario()}";
-        return $this->db->query($sql);
+        $sql = "UPDATE uen SET uen = ?, codigo = ? WHERE id_uen = ? AND id_usuario = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param('ssii', $this->uen, $this->codigo, $this->id_uen, $this->id_usuario);
+        return $stmt->execute();
+    }
+
+    public function eliminar() {
+        $sql = "DELETE FROM uen WHERE id_uen = ? AND id_usuario = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param('ii', $this->id_uen, $this->id_usuario);
+        return $stmt->execute();
     }
 }
+?>
