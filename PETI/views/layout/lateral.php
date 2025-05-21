@@ -108,7 +108,7 @@
                     </li>
                     <li class="menu-item">
                         <i class="fas fa-globe"></i>
-                        <a href="#">9. Análisis PESTEL</a>
+                        <a href="<?=base_url?>pestel/index">9. Análisis PESTEL</a>
                     </li>
                 </ul>
             </div>
