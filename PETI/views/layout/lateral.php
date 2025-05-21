@@ -104,7 +104,7 @@
                     </li>
                     <li class="menu-item">
                         <i class="fas fa-chess-board"></i>
-                        <a href="#">8. 5 Fuerzas Porter</a>
+                        <a href="<?=base_url?>porter/index">8. 5 Fuerzas Porter</a>
                     </li>
                     <li class="menu-item">
                         <i class="fas fa-globe"></i>
