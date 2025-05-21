@@ -95,5 +95,23 @@ class Debilidad {
                 AND id_usuario = {$this->getIdUsuario()}";
         return $this->db->query($sql);
     }
+
+    // Agregar estos métodos
+public function actualizar() {
+    $sql = "UPDATE debilidad SET 
+            debilidad = '{$this->getDebilidad()}'
+            WHERE id_debilidad = {$this->getIdDebilidad()} 
+            AND id_usuario = {$this->getIdUsuario()}";
+    return $this->db->query($sql);
+}
+
+public function obtenerPorIdYUsuario($id_debilidad, $id_usuario) {
+    $sql = "SELECT * FROM debilidad 
+            WHERE id_debilidad = $id_debilidad 
+            AND id_usuario = $id_usuario 
+            LIMIT 1";
+    $resultado = $this->db->query($sql);
+    return $resultado ? $resultado->fetch_object() : false;
+}
 }
 ?>

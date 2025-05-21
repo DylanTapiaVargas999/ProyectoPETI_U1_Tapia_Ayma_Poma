@@ -183,5 +183,53 @@ class EncuestaCadena {
         $resultado = $this->db->query($sql);
         return $resultado ? $resultado->fetch_object() : false;
     }
+
+// Agregar este método para actualizar
+public function actualizar() {
+    $sql = "UPDATE encuesta_cadena SET 
+            p1 = {$this->getP1()}, 
+            p2 = {$this->getP2()}, 
+            p3 = {$this->getP3()}, 
+            p4 = {$this->getP4()}, 
+            p5 = {$this->getP5()}, 
+            p6 = {$this->getP6()}, 
+            p7 = {$this->getP7()}, 
+            p8 = {$this->getP8()}, 
+            p9 = {$this->getP9()}, 
+            p10 = {$this->getP10()}, 
+            p11 = {$this->getP11()}, 
+            p12 = {$this->getP12()}, 
+            p13 = {$this->getP13()}, 
+            p14 = {$this->getP14()}, 
+            p15 = {$this->getP15()}, 
+            p16 = {$this->getP16()}, 
+            p17 = {$this->getP17()}, 
+            p18 = {$this->getP18()}, 
+            p19 = {$this->getP19()}, 
+            p20 = {$this->getP20()}, 
+            p21 = {$this->getP21()}, 
+            p22 = {$this->getP22()}, 
+            p23 = {$this->getP23()}, 
+            p24 = {$this->getP24()}, 
+            p25 = {$this->getP25()}, 
+            reflexion = '{$this->getReflexion()}'
+            WHERE id_encuesta_cadena = {$this->getIdEncuestaCadena()} 
+            AND id_usuario = {$this->getIdUsuario()}";
+    
+    return $this->db->query($sql);
+}
+
+// Agregar este método para obtener por ID y usuario
+public function obtenerPorIdYUsuario($id_encuesta, $id_usuario) {
+    $sql = "SELECT * FROM encuesta_cadena 
+            WHERE id_encuesta_cadena = $id_encuesta 
+            AND id_usuario = $id_usuario 
+            LIMIT 1";
+    $resultado = $this->db->query($sql);
+    return $resultado ? $resultado->fetch_object() : false;
+}
+
+
+
 }
 ?>

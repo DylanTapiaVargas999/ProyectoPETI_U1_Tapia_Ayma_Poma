@@ -92,11 +92,11 @@
                 <ul class="menu-list">
                     <li class="menu-item">
                         <i class="fas fa-search"></i>
-                        <a href="<?=base_url?>analisis/index">5. Análisis FODA</a>
+                        <a href="<?=base_url?>analisis/info">5. Análisis FODA</a>
                     </li>
                     <li class="menu-item">
                         <i class="fas fa-link"></i>
-                        <a href="#">6. Cadena de Valor</a>
+                        <a href="<?=base_url?>analisis/index">6. Cadena de Valor</a>
                     </li>
                     <li class="menu-item">
                         <i class="fas fa-th"></i>

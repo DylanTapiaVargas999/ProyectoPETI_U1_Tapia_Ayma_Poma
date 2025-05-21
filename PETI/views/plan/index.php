@@ -1,3 +1,7 @@
+<head>
+    <link rel="stylesheet" href="<?=base_url?>assets/css/plan/index.css">
+</head>
+
 <?php if (isset($_SESSION['exito_plan'])): ?>
     <div class="alert alert-success"><?= $_SESSION['exito_plan'] ?></div>
     <?php unset($_SESSION['exito_plan']); ?>

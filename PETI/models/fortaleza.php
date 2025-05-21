@@ -95,5 +95,22 @@ class Fortaleza {
                 AND id_usuario = {$this->getIdUsuario()}";
         return $this->db->query($sql);
     }
+    // Agregar estos métodos
+public function actualizar() {
+    $sql = "UPDATE fortaleza SET 
+            fortaleza = '{$this->getFortaleza()}'
+            WHERE id_fortaleza = {$this->getIdFortaleza()} 
+            AND id_usuario = {$this->getIdUsuario()}";
+    return $this->db->query($sql);
+}
+
+public function obtenerPorIdYUsuario($id_fortaleza, $id_usuario) {
+    $sql = "SELECT * FROM fortaleza 
+            WHERE id_fortaleza = $id_fortaleza 
+            AND id_usuario = $id_usuario 
+            LIMIT 1";
+    $resultado = $this->db->query($sql);
+    return $resultado ? $resultado->fetch_object() : false;
+}
 }
 ?>

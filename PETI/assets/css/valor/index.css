@@ -12,15 +12,15 @@
     --color-warning: #ffd166;
     --sombra: 0 4px 20px rgba(0, 0, 0, 0.25);
     --sombra-hover: 0 6px 25px rgba(0, 0, 0, 0.3);
-    --degradado-vision: linear-gradient(135deg, rgba(76, 201, 240, 0.1) 0%, rgba(247, 37, 133, 0.1) 100%);
+    --degradado-valor: linear-gradient(135deg, rgba(76, 201, 240, 0.08) 0%, rgba(247, 37, 133, 0.08) 100%);
 }
 
 /* ESTILOS BASE */
-.vision-container {
+.valor-container {
     max-width: 1000px;
     margin: 2rem auto;
     padding: 2rem;
-    background: rgba(26, 26, 46, 0.8);
+    background: rgba(26, 26, 46, 0.85);
     border-radius: 15px;
     box-shadow: var(--sombra);
     backdrop-filter: blur(10px);
@@ -40,10 +40,11 @@ h1 {
     font-size: 2.5rem;
     margin-bottom: 1.5rem;
     text-align: center;
-    background: var(--degradado-vision);
+    background: var(--degradado-valor);
     padding: 1rem;
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(76, 201, 240, 0.1);
+    animation: pulse 2s infinite;
 }
 
 h1::after, h2::after {
@@ -65,7 +66,6 @@ h2 {
     margin: 2rem 0 1.5rem;
 }
 
-/* TEXTO Y PÁRRAFOS */
 p, li {
     line-height: 1.6;
     margin-bottom: 1rem;
@@ -83,6 +83,19 @@ ul {
 li {
     margin-bottom: 0.75rem;
     position: relative;
+}
+
+.valor-examples {
+    list-style: disc inside;
+}
+
+.valor-description {
+    background: rgba(22, 33, 62, 0.5);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--color-borde);
+    background-image: var(--degradado-valor);
 }
 
 /* ALERTAS */
@@ -122,7 +135,7 @@ label {
 
 textarea {
     width: 100%;
-    min-height: 150px;
+    min-height: 120px;
     padding: 1rem;
     border-radius: 8px;
     border: 1px solid var(--color-borde);
@@ -142,7 +155,7 @@ textarea:focus {
 }
 
 /* BOTONES */
-button, .button {
+button, .button, .btn-cancelar {
     padding: 0.75rem 1.5rem;
     border-radius: 8px;
     font-weight: 600;
@@ -157,39 +170,38 @@ button, .button {
     text-decoration: none;
 }
 
-button[type="submit"] {
+button[type="submit"], .btn-cancelar {
     background: var(--color-acento);
     color: white;
     box-shadow: 0 4px 15px rgba(76, 201, 240, 0.3);
 }
 
-button[type="submit"]:hover {
+button[type="submit"]:hover, .btn-cancelar:hover {
     background: var(--color-acento-secundario);
     transform: translateY(-2px);
     box-shadow: var(--sombra-hover);
 }
 
-.button-cancel {
+.btn-cancelar {
     background: var(--color-error);
-    color: white;
+    margin-left: 1rem;
 }
 
-.button-cancel:hover {
+.btn-cancelar:hover {
     background: #d63031;
-    transform: translateY(-2px);
 }
 
-/* LISTA DE VISIONES */
-.vision-list {
+/* LISTA DE VALORES */
+.lista-valores {
     margin-top: 3rem;
 }
 
-.vision-list ul {
+.lista-valores ul {
     list-style: none;
     padding: 0;
 }
 
-.vision-list li {
+.lista-valores li {
     background: rgba(22, 33, 62, 0.6);
     border: 1px solid var(--color-borde);
     border-radius: 8px;
@@ -197,41 +209,48 @@ button[type="submit"]:hover {
     margin-bottom: 1rem;
     transition: all 0.3s ease;
     position: relative;
-    background-image: var(--degradado-vision);
+    background-image: var(--degradado-valor);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.vision-list li:hover {
+.lista-valores li:hover {
     background: rgba(22, 33, 62, 0.8);
     transform: translateY(-3px);
     box-shadow: var(--sombra);
 }
 
-.vision-list a {
+.acciones {
+    display: flex;
+    gap: 1rem;
+}
+
+.acciones a {
     color: var(--color-acento);
-    margin-left: 1rem;
     text-decoration: none;
     transition: all 0.3s ease;
     font-size: 0.9rem;
     font-weight: 500;
+    border-radius: 5px;
+    padding: 0.3rem 0.7rem;
+    background: rgba(76, 201, 240, 0.08);
 }
 
-.vision-list a:hover {
+.acciones a:hover {
     color: var(--color-acento-secundario);
+    background: rgba(247, 37, 133, 0.08);
     text-decoration: underline;
 }
 
-.vision-list a:first-of-type {
-    margin-left: 0;
-}
-
 /* CONTENEDOR DE EDICIÓN */
-.editar-vision-container {
+.editar-valor-container {
     background: rgba(22, 33, 62, 0.6);
     border-radius: 10px;
     padding: 2rem;
     margin: 2rem 0;
     border: 1px solid var(--color-borde);
-    background-image: var(--degradado-vision);
+    background-image: var(--degradado-valor);
 }
 
 /* ANIMACIONES */
@@ -246,59 +265,45 @@ button[type="submit"]:hover {
     100% { box-shadow: 0 0 0 0 rgba(76, 201, 240, 0); }
 }
 
-.vision-container {
-    animation: fadeIn 0.5s ease-out forwards;
-}
-
-h1 {
-    animation: pulse 2s infinite;
-}
-
 /* RESPONSIVE */
 @media (max-width: 768px) {
-    .vision-container {
+    .valor-container {
         padding: 1.5rem;
         margin: 1rem;
     }
-    
     h1 {
         font-size: 2rem;
         animation: none;
     }
-    
     h2 {
         font-size: 1.5rem;
     }
-    
-    .vision-list li {
+    .lista-valores li {
         padding: 1rem;
+        flex-direction: column;
+        align-items: flex-start;
     }
-    
-    .vision-list a {
-        display: block;
-        margin: 0.5rem 0 0 0;
+    .acciones {
+        margin-top: 0.5rem;
     }
 }
 
 @media (max-width: 480px) {
-    .vision-container {
+    .valor-container {
         padding: 1rem;
     }
-    
     h1 {
-        font-size: 1.8rem;
+        font-size: 1.5rem;
     }
-    
-    .editar-vision-container {
+    .editar-valor-container {
         padding: 1rem;
     }
-    
-    button, .button {
+    button, .button, .btn-cancelar {
         width: 100%;
         margin-bottom: 0.5rem;
     }
-    
-    div[style*="display: flex"] {
+    .acciones {
         flex-direction: column;
+        gap: 0.5rem;
     }
 }

@@ -4,6 +4,43 @@
 
 <div class="valor-container">
     <h1>VALORES ORGANIZACIONALES</h1>
+        
+    <p><strong>Los VALORES</strong> de una empresa son el conjunto de principios, reglas y aspectos culturales con los que se rige la organización. Son las pautas de comportamiento de la empresa y generalmente son pocos, entre 3 y 6. Son tan fundamentales y tan arraigados que casi nunca cambian.</p>
+
+    <div class="valor-description">
+        <h3>Ejemplos de Valores</h3>
+        <ul class="valor-examples">
+            <li>Integridad</li>
+            <li>Compromiso con el desarrollo humano</li>
+            <li>Ética profesional</li>
+            <li>Responsabilidad social</li>
+            <li>Innovación</li>
+            <li>Etc.</li>
+        </ul>
+    </div>
+
+    <div class="valor-description">
+        <h3>EJEMPLOS DE VALORES SEGÚN TIPO DE EMPRESA</h3>
+        <ul class="valor-examples">
+            <li><strong>Empresa de servicios</strong></li>
+            <ul>
+                <li>La excelencia en la prestación de servicios</li>
+                <li>La innovación orientada a la mejora continua de procesos, productos y servicios.</li>
+                <li>La promoción del diálogo y compromiso con los grupos de interés.</li>
+            </ul>
+            <li><strong>Empresa productora de café</strong></li>
+            <ul>
+                <li>Nuestro valor es la búsqueda de la perfección, entendida como amor por lo bello y bien hecho, y la ética, entendida como construcción de valor en el tiempo a través de la sostenibilidad, la transparencia, y la valorización de las personas.</li>
+            </ul>
+            <li><strong>Agencia de certificación</strong></li>
+            <ul>
+                <li>Integridad y ética</li>
+                <li>Consejo y validación imparciales</li>
+                <li>Respeto por todas las personas</li>
+                <li>Responsabilidad social y medioambiental</li>
+            </ul>
+        </ul>
+    </div>
 
     <?php if (isset($_SESSION['valor_guardado'])): ?>
         <div class="alert <?= $_SESSION['valor_guardado'] == 'completado' ? 'alert-success' : 'alert-error' ?>">

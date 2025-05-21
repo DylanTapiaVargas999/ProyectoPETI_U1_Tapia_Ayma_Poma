@@ -34,3 +34,58 @@ document.querySelectorAll('.menu-item').forEach(item => {
         this.classList.add('active');
     });
 });
+
+// Función para alternar el menú de perfil
+function toggleProfileMenu() {
+    const profile = document.querySelector('.user-profile');
+    profile.classList.toggle('active');
+}
+
+// Cerrar menú de perfil al hacer clic fuera
+document.addEventListener('click', function(event) {
+    const profile = document.querySelector('.user-profile');
+    const isClickInside = profile.contains(event.target);
+    
+    if (!isClickInside && profile.classList.contains('active')) {
+        profile.classList.remove('active');
+    }
+});
+
+// Función para marcar el ítem de menú activo
+function setActiveMenuItem() {
+    const currentPage = window.location.pathname.split('/').pop() || 'index';
+    const menuItems = document.querySelectorAll('.menu-item a');
+    
+    menuItems.forEach(item => {
+        const href = item.getAttribute('href');
+        const page = href.split('/').pop().split('?')[0];
+        
+        if (currentPage.includes(page) && page !== '') {
+            item.parentElement.classList.add('active');
+        }
+    });
+}
+
+// Función para abrir modal de login (debe ser implementada)
+function abrirModalLogin() {
+    // Implementar lógica para abrir modal de login
+    console.log('Abrir modal de login');
+}
+
+// Inicializar cuando el DOM esté cargado
+document.addEventListener('DOMContentLoaded', function() {
+    setActiveMenuItem();
+    
+    // Alternar sidebar en móviles (necesita botón de toggle en el header)
+    const sidebarToggle = document.createElement('div');
+    sidebarToggle.className = 'sidebar-toggle';
+    sidebarToggle.innerHTML = '<i class="fas fa-bars"></i>';
+    sidebarToggle.addEventListener('click', function() {
+        document.querySelector('.sidebar').classList.toggle('active');
+    });
+    
+    // Agregar botón de toggle si es móvil
+    if (window.innerWidth < 992) {
+        document.body.appendChild(sidebarToggle);
+    }
+});

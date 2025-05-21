@@ -1,5 +1,5 @@
 <head>
-    <link rel="stylesheet" href="<?=base_url?>assets/css/vision/index.css">
+    <link rel="stylesheet" href="<?=base_url?>assets/css/mision/index.css">
 </head>
 
 <div class="mision-container">

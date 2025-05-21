@@ -1,9 +1,13 @@
 <?php
-require_once 'models/EncuestaCadena.php';
-require_once 'models/Fortaleza.php';
-require_once 'models/Debilidad.php';
+require_once 'models/debilidad.php';
+require_once 'models/fortaleza.php';
+require_once 'models/encuestaCadena.php';
 
 class AnalisisControlador {
+    public function info() {
+    require_once 'views/analisis/info.php';
+}
+
 
     public function index() {
         if (!isset($_SESSION['identity'])) {
@@ -23,47 +27,35 @@ class AnalisisControlador {
             $id_usuario = $_SESSION['identity']->id;
             $codigo_plan = $_SESSION['plan_codigo'];
 
-            // Instanciar los modelos
-            $encuesta = new EncuestaCadena();
-            $fortaleza = new Fortaleza();
+            // Obtener datos de los modelos
             $debilidad = new Debilidad();
+            $fortaleza = new Fortaleza();
+            $encuesta = new EncuestaCadena();
 
-            // Obtener datos de cada modelo
-            $datos_encuesta = $encuesta->obtenerPorCodigo($codigo_plan);
-            $fortalezas = $fortaleza->obtenerPorCodigo($codigo_plan);
             $debilidades = $debilidad->obtenerPorCodigo($codigo_plan);
+            $fortalezas = $fortaleza->obtenerPorCodigo($codigo_plan);
+            $encuestaActual = $encuesta->obtenerPorCodigo($codigo_plan);
 
             // 🔧 MODO EDICIÓN
-            $edicion_encuesta = isset($_GET['editar_encuesta']) && is_numeric($_GET['editar_encuesta']);
-            $edicion_fortaleza = isset($_GET['editar_fortaleza']) && is_numeric($_GET['editar_fortaleza']);
-            $edicion_debilidad = isset($_GET['editar_debilidad']) && is_numeric($_GET['editar_debilidad']);
+            $edicionDebilidad = isset($_GET['editarDebilidad']) && is_numeric($_GET['editarDebilidad']);
+            $edicionFortaleza = isset($_GET['editarFortaleza']) && is_numeric($_GET['editarFortaleza']);
+            
+            $debilidadActual = null;
+            $fortalezaActual = null;
 
-            // Obtener datos para edición si es necesario
-            $encuesta_actual = null;
-            $fortaleza_actual = null;
-            $debilidad_actual = null;
-
-            if ($edicion_encuesta) {
-                $encuesta_actual = $encuesta->obtenerUno($_GET['editar_encuesta']);
-                if (!$encuesta_actual || $encuesta_actual->id_usuario != $id_usuario) {
-                    $_SESSION['error_analisis'] = 'No tienes permiso para editar esta encuesta';
-                    $edicion_encuesta = false;
-                }
-            }
-
-            if ($edicion_fortaleza) {
-                $fortaleza_actual = $fortaleza->obtenerPorIdYUsuario($_GET['editar_fortaleza'], $id_usuario);
-                if (!$fortaleza_actual) {
-                    $_SESSION['error_analisis'] = 'No tienes permiso para editar esta fortaleza';
-                    $edicion_fortaleza = false;
-                }
-            }
-
-            if ($edicion_debilidad) {
-                $debilidad_actual = $debilidad->obtenerPorIdYUsuario($_GET['editar_debilidad'], $id_usuario);
-                if (!$debilidad_actual) {
+            if ($edicionDebilidad) {
+                $debilidadActual = $debilidad->obtenerPorIdYUsuario($_GET['editarDebilidad'], $id_usuario);
+                if (!$debilidadActual) {
                     $_SESSION['error_analisis'] = 'No tienes permiso para editar esta debilidad';
-                    $edicion_debilidad = false;
+                    $edicionDebilidad = false;
+                }
+            }
+
+            if ($edicionFortaleza) {
+                $fortalezaActual = $fortaleza->obtenerPorIdYUsuario($_GET['editarFortaleza'], $id_usuario);
+                if (!$fortalezaActual) {
+                    $_SESSION['error_analisis'] = 'No tienes permiso para editar esta fortaleza';
+                    $edicionFortaleza = false;
                 }
             }
 
@@ -76,7 +68,7 @@ class AnalisisControlador {
         }
     }
 
-    public function guardarEncuesta() {
+    public function guardarDebilidad() {
         if (!isset($_SESSION['identity']) || $_SERVER['REQUEST_METHOD'] != 'POST') {
             $_SESSION['error_analisis'] = 'Acceso no autorizado';
             header("Location:" . base_url . "usuario/iniciarSesion");
@@ -88,71 +80,40 @@ class AnalisisControlador {
                 throw new Exception('No has seleccionado un plan activo');
             }
 
-            $id_usuario = $_SESSION['identity']->id;
-            $codigo_plan = $_SESSION['plan_codigo'];
-            $id_encuesta = $_POST['id_encuesta'] ?? null;
+            $textoDebilidad = trim($_POST['debilidad'] ?? '');
+            $codigoPlan = $_SESSION['plan_codigo'];
+            $id_debilidad = $_POST['id_debilidad'] ?? null;
 
-            // Validar que todas las preguntas estén presentes
-            $preguntas = [];
-            for ($i = 1; $i <= 25; $i++) {
-                $preguntas['p'.$i] = isset($_POST['p'.$i]) ? (int)$_POST['p'.$i] : 0;
+            if (empty($textoDebilidad)) {
+                throw new Exception('La debilidad no puede estar vacía');
             }
 
-            $reflexion = trim($_POST['reflexion'] ?? '');
+            $debilidad = new Debilidad();
+            $debilidad->setDebilidad($textoDebilidad)
+                     ->setCodigo($codigoPlan)
+                     ->setIdUsuario($_SESSION['identity']->id);
 
-            $encuesta = new EncuestaCadena();
-            
-            // Establecer todas las propiedades
-            $encuesta->setP1($preguntas['p1'])
-                    ->setP2($preguntas['p2'])
-                    ->setP3($preguntas['p3'])
-                    ->setP4($preguntas['p4'])
-                    ->setP5($preguntas['p5'])
-                    ->setP6($preguntas['p6'])
-                    ->setP7($preguntas['p7'])
-                    ->setP8($preguntas['p8'])
-                    ->setP9($preguntas['p9'])
-                    ->setP10($preguntas['p10'])
-                    ->setP11($preguntas['p11'])
-                    ->setP12($preguntas['p12'])
-                    ->setP13($preguntas['p13'])
-                    ->setP14($preguntas['p14'])
-                    ->setP15($preguntas['p15'])
-                    ->setP16($preguntas['p16'])
-                    ->setP17($preguntas['p17'])
-                    ->setP18($preguntas['p18'])
-                    ->setP19($preguntas['p19'])
-                    ->setP20($preguntas['p20'])
-                    ->setP21($preguntas['p21'])
-                    ->setP22($preguntas['p22'])
-                    ->setP23($preguntas['p23'])
-                    ->setP24($preguntas['p24'])
-                    ->setP25($preguntas['p25'])
-                    ->setCodigo($codigo_plan)
-                    ->setReflexion($reflexion)
-                    ->setIdUsuario($id_usuario);
-
-            if ($id_encuesta) {
+            if ($id_debilidad) {
                 // Modo edición
-                $encuesta->setIdEncuestaCadena($id_encuesta);
-                $resultado = $encuesta->actualizar();
-                $_SESSION['encuesta_actualizada'] = $resultado ? 'completado' : 'fallido';
+                $debilidad->setIdDebilidad($id_debilidad);
+                $resultado = $debilidad->actualizar();
+                $_SESSION['debilidad_actualizada'] = $resultado ? 'completado' : 'fallido';
             } else {
                 // Modo creación
-                $resultado = $encuesta->guardar();
-                $_SESSION['encuesta_guardada'] = $resultado ? 'completado' : 'fallido';
+                $resultado = $debilidad->guardar();
+                $_SESSION['debilidad_guardada'] = $resultado ? 'completado' : 'fallido';
             }
 
             if (!$resultado) {
-                throw new Exception('Error al procesar la encuesta en la base de datos');
+                throw new Exception('Error al procesar la debilidad en la base de datos');
             }
 
         } catch (Exception $e) {
             $_SESSION['error_analisis'] = $e->getMessage();
-            if ($id_encuesta) {
-                $_SESSION['encuesta_actualizada'] = 'fallido';
+            if ($id_debilidad) {
+                $_SESSION['debilidad_actualizada'] = 'fallido';
             } else {
-                $_SESSION['encuesta_guardada'] = 'fallido';
+                $_SESSION['debilidad_guardada'] = 'fallido';
             }
         }
 
@@ -213,7 +174,7 @@ class AnalisisControlador {
         exit();
     }
 
-    public function guardarDebilidad() {
+    public function guardarEncuesta() {
         if (!isset($_SESSION['identity']) || $_SERVER['REQUEST_METHOD'] != 'POST') {
             $_SESSION['error_analisis'] = 'Acceso no autorizado';
             header("Location:" . base_url . "usuario/iniciarSesion");
@@ -225,70 +186,46 @@ class AnalisisControlador {
                 throw new Exception('No has seleccionado un plan activo');
             }
 
-            $textoDebilidad = trim($_POST['debilidad'] ?? '');
             $codigoPlan = $_SESSION['plan_codigo'];
-            $id_debilidad = $_POST['id_debilidad'] ?? null;
+            $id_usuario = $_SESSION['identity']->id;
+            $id_encuesta = $_POST['id_encuesta'] ?? null;
+            $reflexion = trim($_POST['reflexion'] ?? '');
 
-            if (empty($textoDebilidad)) {
-                throw new Exception('La debilidad no puede estar vacía');
+            $encuesta = new EncuestaCadena();
+            $encuesta->setCodigo($codigoPlan)
+                    ->setIdUsuario($id_usuario)
+                    ->setReflexion($reflexion);
+
+            // Establecer todas las respuestas de la encuesta
+            for ($i = 1; $i <= 25; $i++) {
+                $pregunta = 'p' . $i;
+                $valor = isset($_POST[$pregunta]) ? (int)$_POST[$pregunta] : 0;
+                $setter = 'setP' . $i;
+                $encuesta->$setter($valor);
             }
 
-            $debilidad = new Debilidad();
-            $debilidad->setDebilidad($textoDebilidad)
-                      ->setCodigo($codigoPlan)
-                      ->setIdUsuario($_SESSION['identity']->id);
-
-            if ($id_debilidad) {
+            if ($id_encuesta) {
                 // Modo edición
-                $debilidad->setIdDebilidad($id_debilidad);
-                $resultado = $debilidad->actualizar();
-                $_SESSION['debilidad_actualizada'] = $resultado ? 'completado' : 'fallido';
+                $encuesta->setIdEncuestaCadena($id_encuesta);
+                $resultado = $encuesta->actualizar();
+                $_SESSION['encuesta_actualizada'] = $resultado ? 'completado' : 'fallido';
             } else {
                 // Modo creación
-                $resultado = $debilidad->guardar();
-                $_SESSION['debilidad_guardada'] = $resultado ? 'completado' : 'fallido';
+                $resultado = $encuesta->guardar();
+                $_SESSION['encuesta_guardada'] = $resultado ? 'completado' : 'fallido';
             }
 
             if (!$resultado) {
-                throw new Exception('Error al procesar la debilidad en la base de datos');
+                throw new Exception('Error al procesar la encuesta en la base de datos');
             }
 
         } catch (Exception $e) {
             $_SESSION['error_analisis'] = $e->getMessage();
-            if ($id_debilidad) {
-                $_SESSION['debilidad_actualizada'] = 'fallido';
+            if ($id_encuesta) {
+                $_SESSION['encuesta_actualizada'] = 'fallido';
             } else {
-                $_SESSION['debilidad_guardada'] = 'fallido';
+                $_SESSION['encuesta_guardada'] = 'fallido';
             }
-        }
-
-        header("Location:" . base_url . "analisis/index");
-        exit();
-    }
-
-    public function eliminarFortaleza() {
-        if (!isset($_SESSION['identity']) || !isset($_GET['id'])) {
-            $_SESSION['error_analisis'] = 'Acceso no autorizado';
-            header("Location:" . base_url . "usuario/iniciarSesion");
-            exit();
-        }
-
-        try {
-            $id_fortaleza = (int)$_GET['id'];
-            $id_usuario = $_SESSION['identity']->id;
-
-            $fortaleza = new Fortaleza();
-            $fortaleza->setIdFortaleza($id_fortaleza)
-                     ->setIdUsuario($id_usuario);
-
-            if ($fortaleza->eliminar()) {
-                $_SESSION['fortaleza_eliminada'] = 'completado';
-            } else {
-                throw new Exception('Error al eliminar la fortaleza');
-            }
-        } catch (Exception $e) {
-            $_SESSION['fortaleza_eliminada'] = 'fallido';
-            $_SESSION['error_analisis'] = $e->getMessage();
         }
 
         header("Location:" . base_url . "analisis/index");
@@ -324,20 +261,32 @@ class AnalisisControlador {
         exit();
     }
 
-    // Métodos auxiliares que podrías necesitar
-    private function obtenerPorIdYUsuario($modelo, $id, $id_usuario) {
-        switch ($modelo) {
-            case 'fortaleza':
-                $obj = new Fortaleza();
-                break;
-            case 'debilidad':
-                $obj = new Debilidad();
-                break;
-            default:
-                return false;
+    public function eliminarFortaleza() {
+        if (!isset($_SESSION['identity']) || !isset($_GET['id'])) {
+            $_SESSION['error_analisis'] = 'Acceso no autorizado';
+            header("Location:" . base_url . "usuario/iniciarSesion");
+            exit();
         }
 
-        $obj->setId($id)->setIdUsuario($id_usuario);
-        return $obj->obtenerUno();
+        try {
+            $id_fortaleza = (int)$_GET['id'];
+            $id_usuario = $_SESSION['identity']->id;
+
+            $fortaleza = new Fortaleza();
+            $fortaleza->setIdFortaleza($id_fortaleza)
+                     ->setIdUsuario($id_usuario);
+
+            if ($fortaleza->eliminar()) {
+                $_SESSION['fortaleza_eliminada'] = 'completado';
+            } else {
+                throw new Exception('Error al eliminar la fortaleza');
+            }
+        } catch (Exception $e) {
+            $_SESSION['fortaleza_eliminada'] = 'fallido';
+            $_SESSION['error_analisis'] = $e->getMessage();
+        }
+
+        header("Location:" . base_url . "analisis/index");
+        exit();
     }
 }
