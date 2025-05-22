@@ -1,142 +1,146 @@
 <head>
     <link rel="stylesheet" href="<?=base_url?>assets/css/pestel/index.css">
-    <style>
-        .pregunta-table {
-            width: 100%;
-            margin-bottom: 30px;
-            border-collapse: collapse;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .pregunta-table th, .pregunta-table td {
-            padding: 12px;
-            text-align: center;
-            border: 1px solid #e0e0e0;
-        }
-        .pregunta-table th {
-            background-color: #f8f9fa;
-            font-weight: 600;
-            color: #495057;
-        }
-        .pregunta-table .pregunta-text {
-            text-align: left;
-            font-weight: normal;
-            width: 40%;
-        }
-        .pregunta-table input[type="radio"] {
-            transform: scale(1.2);
-            cursor: pointer;
-        }
-        .section-title {
-            background-color: #3498db;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 5px;
-            margin: 25px 0 15px 0;
-        }
-        .section-subtitle {
-            color: #3498db;
-            font-weight: 600;
-            margin: 20px 0 10px 0;
-            padding-left: 10px;
-            border-left: 4px solid #3498db;
-        }
-        .resultado-container {
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 5px;
-            margin: 30px 0;
-            border: 1px solid #dee2e6;
-        }
-        .scale-labels {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-            font-size: 0.9em;
-            color: #6c757d;
-        }
-        .factor-result {
-            margin-bottom: 15px;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        .negative {
-            background-color: #ffebee;
-            border-left: 4px solid #f44336;
-        }
-        .positive {
-            background-color: #e8f5e9;
-            border-left: 4px solid #4caf50;
-        }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        function calcularResultado() {
-            // Factores y sus rangos de preguntas
-            const factores = {
-                'Sociales': { inicio: 1, fin: 5 },
-                'Medioambientales': { inicio: 6, fin: 10 },
-                'Políticos': { inicio: 11, fin: 15 },
-                'Económicos': { inicio: 16, fin: 20 },
-                'Tecnológicos': { inicio: 21, fin: 25 }
-            };
 
-            let resultadosHTML = '';
-            let totalGeneral = 0;
-            let preguntasContestadas = 0;
 
-            // Calcular para cada factor
-            for (const [nombreFactor, rango] of Object.entries(factores)) {
-                let totalFactor = 0;
-                let preguntasFactor = 0;
-
-                for (let i = rango.inicio; i <= rango.fin; i++) {
-                    const seleccion = document.querySelector(`input[name="p${i}"]:checked`);
-                    if (seleccion) {
-                        totalFactor += parseInt(seleccion.value);
-                        preguntasFactor++;
-                        preguntasContestadas++;
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('resultadosChart').getContext('2d');
+            let chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Porcentaje de impacto',
+                        data: [],
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Porcentaje (%)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Impacto de Factores en la Empresa',
+                            font: {
+                                size: 18
+                            }
+                        },
+                        legend: {
+                            display: false
+                        }
                     }
                 }
+            });
 
-                // Calcular porcentaje (máximo 20 por factor: 5 preguntas * 4 puntos)
-                const porcentaje = preguntasFactor > 0 ? Math.round((totalFactor / 20) * 100) : 0;
-                totalGeneral += porcentaje;
+            function calcularResultado() {
+                // Factores y sus rangos de preguntas
+                const factores = {
+                    'Sociales': { inicio: 1, fin: 5 },
+                    'Medioambientales': { inicio: 6, fin: 10 },
+                    'Políticos': { inicio: 11, fin: 15 },
+                    'Económicos': { inicio: 16, fin: 20 },
+                    'Tecnológicos': { inicio: 21, fin: 25 }
+                };
 
-                // Generar interpretación
-                const interpretacion = porcentaje < 70 ? 
-                    `❌ NO hay un notable impacto de factores ${nombreFactor.toLowerCase()} en el funcionamiento de la empresa.` : 
-                    `✅ HAY un notable impacto de factores ${nombreFactor.toLowerCase()} en el funcionamiento de la empresa.`;
+                let resultadosHTML = '';
+                let totalGeneral = 0;
+                let preguntasContestadas = 0;
+                
+                // Arrays para el gráfico
+                const labels = [];
+                const data = [];
+                const backgroundColors = [];
 
-                resultadosHTML += `
-                    <div class="factor-result ${porcentaje < 70 ? 'negative' : 'positive'}">
-                        <strong>${nombreFactor}:</strong> ${porcentaje}%<br>
-                        ${interpretacion}
-                    </div>
-                `;
+                // Calcular para cada factor
+                for (const [nombreFactor, rango] of Object.entries(factores)) {
+                    let totalFactor = 0;
+                    let preguntasFactor = 0;
+
+                    for (let i = rango.inicio; i <= rango.fin; i++) {
+                        const seleccion = document.querySelector(`input[name="p${i}"]:checked`);
+                        if (seleccion) {
+                            totalFactor += parseInt(seleccion.value);
+                            preguntasFactor++;
+                            preguntasContestadas++;
+                        }
+                    }
+
+                    // Calcular porcentaje 
+                    const porcentaje = preguntasFactor > 0 ? Math.round((totalFactor / 20) * 100) : 0;
+                    totalGeneral += porcentaje;
+                    
+                    // Agregar datos para el gráfico
+                    labels.push(nombreFactor);
+                    data.push(porcentaje);
+                    backgroundColors.push(porcentaje < 70 ? 'rgba(255, 99, 132, 0.6)' : 'rgba(75, 192, 192, 0.6)');
+
+                    // Generar interpretación
+                    const interpretacion = porcentaje < 70 ? 
+                        `❌ NO hay un notable impacto de factores ${nombreFactor.toLowerCase()} en el funcionamiento de la empresa.` : 
+                        `✅ HAY un notable impacto de factores ${nombreFactor.toLowerCase()} en el funcionamiento de la empresa.`;
+
+                    resultadosHTML += `
+                        <div class="factor-result ${porcentaje < 70 ? 'negative' : 'positive'}">
+                            <strong>${nombreFactor}:</strong> ${porcentaje}%<br>
+                            ${interpretacion}
+                        </div>
+                    `;
+                }
+
+                // Actualizar el gráfico
+                chart.data.labels = labels;
+                chart.data.datasets[0].data = data;
+                chart.data.datasets[0].backgroundColor = backgroundColors;
+                chart.update();
+
+                // Actualizar resultados
+                const resultadosContainer = document.getElementById("resultados-factores");
+                if (resultadosContainer) resultadosContainer.innerHTML = resultadosHTML;
             }
 
-            // Calcular promedio general si hay preguntas contestadas
-            const promedioGeneral = preguntasContestadas > 0 ? Math.round(totalGeneral / Object.keys(factores).length) : 0;
+            // Agregar listeners a todos los radios
+            const radios = document.querySelectorAll('input[type=radio]');
+            radios.forEach(input => {
+                input.addEventListener('change', calcularResultado);
+            });
 
-            // Actualizar resultados
-            const resultadosContainer = document.getElementById("resultados-factores");
-            const resultadoGeneral = document.getElementById("resultado-general");
-
-            if (resultadosContainer) resultadosContainer.innerHTML = resultadosHTML;
-
-        }
-
-        // Agregar listeners a todos los radios
-        const radios = document.querySelectorAll('input[type=radio]');
-        radios.forEach(input => {
-            input.addEventListener('change', calcularResultado);
+            // Ejecutar al cargar por si hay valores precargados
+            calcularResultado();
         });
+    </script>
 
-        // Ejecutar al cargar por si hay valores precargados
-        calcularResultado();
-    });
-</script>
+
+
+
+
+
 
 <div class="container mt-4">
     <?php if (isset($_SESSION['error_pestel'])): ?>
@@ -435,12 +439,12 @@
         </table>
 
         <!-- RESULTADOS -->
-        <div class="resultado-container">
-            <h4 class="text-center mb-3">Resultados del Análisis PESTEL</h4>
-            
-            <div id="resultados-factores"></div>
-            
+        <div id="resultados-factores"></div>
+        <div id="chart-container">
+            <canvas id="resultadosChart"></canvas>
         </div>
+    
+    
 
         <div class="text-center mb-5">
             <button type="submit" class="btn btn-primary btn-lg">Guardar Análisis</button>
