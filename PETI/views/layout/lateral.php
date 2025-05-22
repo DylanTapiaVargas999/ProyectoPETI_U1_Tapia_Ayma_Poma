@@ -100,7 +100,7 @@
                     </li>
                     <li class="menu-item">
                         <i class="fas fa-th"></i>
-                        <a href="#">7. Matriz BCG</a>
+                        <a href="<?=base_url?>BCG/index">7. Matriz BCG</a>
                     </li>
                     <li class="menu-item">
                         <i class="fas fa-chess-board"></i>
