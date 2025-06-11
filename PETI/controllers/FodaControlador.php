@@ -11,300 +11,248 @@ require_once 'models/MatrizDA.php';
 class FodaControlador {
 
     public function index() {
-    if (!isset($_SESSION['identity'])) {
-        $_SESSION['error_foda'] = 'Debes iniciar sesión para acceder a esta sección';
-        header("Location:" . base_url . "usuario/iniciarSesion");
-        exit();
+        if (!isset($_SESSION['identity'])) {
+            $_SESSION['error_foda'] = 'Debes iniciar sesión para acceder a esta sección';
+            header("Location:" . base_url . "usuario/iniciarSesion");
+            exit();
+        }
+
+        if (!isset($_SESSION['plan_codigo'])) {
+            $_SESSION['error_foda'] = 'Debes seleccionar un plan estratégico primero';
+            header("Location:" . base_url . "planEstrategico/seleccionar");
+            exit();
+        }
+
+        try {
+            $id_usuario = $_SESSION['identity']->id;
+            $codigo_plan = $_SESSION['plan_codigo'];
+
+            // Obtener elementos FODA
+            $fortalezas = $this->obtenerElementos('Fortaleza', $codigo_plan, $id_usuario);
+            $debilidades = $this->obtenerElementos('Debilidad', $codigo_plan, $id_usuario);
+            $oportunidades = $this->obtenerElementos('Oportunidad', $codigo_plan, $id_usuario);
+            $amenazas = $this->obtenerElementos('Amenaza', $codigo_plan, $id_usuario);
+
+            // Obtener matrices existentes
+            $matrizFO = $this->obtenerMatriz('MatrizFO', $codigo_plan);
+            $matrizFA = $this->obtenerMatriz('MatrizFA', $codigo_plan);
+            $matrizDO = $this->obtenerMatriz('MatrizDO', $codigo_plan);
+            $matrizDA = $this->obtenerMatriz('MatrizDA', $codigo_plan);
+
+            // Calcular totales estratégicos
+            $totales = [
+                'FO' => $this->calcularTotalMatriz($matrizFO),
+                'FA' => $this->calcularTotalMatriz($matrizFA),
+                'DO' => $this->calcularTotalMatriz($matrizDO),
+                'DA' => $this->calcularTotalMatriz($matrizDA)
+            ];
+
+            // Determinar estrategia principal
+            $estrategiaPrincipal = $this->determinarEstrategiaPrincipal($totales);
+
+            require_once 'views/foda/index.php';
+
+        } catch (Exception $e) {
+            $_SESSION['error_foda'] = 'Error al cargar los datos FODA: ' . $e->getMessage();
+            header("Location:" . base_url . "foda/index");
+            exit();
+        }
     }
 
-    if (!isset($_SESSION['plan_codigo'])) {
-        $_SESSION['error_foda'] = 'Debes seleccionar un plan estratégico primero';
-        header("Location:" . base_url . "planEstrategico/seleccionar");
-        exit();
-    }
+    public function guardarMatrices() {
+        if (!isset($_SESSION['identity'])) {
+            $_SESSION['error_foda'] = 'Debes iniciar sesión para realizar esta acción';
+            header("Location:" . base_url . "usuario/iniciarSesion");
+            exit();
+        }
 
-    try {
-        $id_usuario = $_SESSION['identity']->id;
-        $codigo_plan = $_SESSION['plan_codigo'];
+        if (!isset($_SESSION['plan_codigo'])) {
+            $_SESSION['error_foda'] = 'Debes seleccionar un plan estratégico primero';
+            header("Location:" . base_url . "planEstrategico/seleccionar");
+            exit();
+        }
 
-        // Obtener elementos FODA básicos
-        $fortalezaModel = new Fortaleza();
-        $debilidadModel = new Debilidad();
-        $oportunidadModel = new Oportunidad();
-        $amenazaModel = new Amenaza();
+        try {
+            $codigo_plan = $_SESSION['plan_codigo'];
+            $exito = true;
 
-        $fortalezas = $this->filtrarPorUsuario($fortalezaModel->obtenerPorCodigo($codigo_plan), $id_usuario);
-        $debilidades = $this->filtrarPorUsuario($debilidadModel->obtenerPorCodigo($codigo_plan), $id_usuario);
-        $oportunidades = $this->filtrarPorUsuario($oportunidadModel->obtenerPorCodigo($codigo_plan), $id_usuario);
-        $amenazas = $this->filtrarPorUsuario($amenazaModel->obtenerPorCodigo($codigo_plan), $id_usuario);
+            // Procesar matriz FO
+            if (isset($_POST['matrizFO'])) {
+                foreach ($_POST['matrizFO'] as $id_fortaleza => $oportunidades) {
+                    foreach ($oportunidades as $id_oportunidad => $valor) {
+                        $matrizFO = new MatrizFO();
+                        $matrizFO->setCodigo($codigo_plan)
+                                ->setIdFortaleza($id_fortaleza)
+                                ->setIdOportunidad($id_oportunidad)
+                                ->setValor($valor);
 
-        // Obtener matrices FODA
-        $matrizFO = new MatrizFO();
-        $matrizFA = new MatrizFA();
-        $matrizDO = new MatrizDO();
-        $matrizDA = new MatrizDA();
-
-        // Obtener todas las relaciones para cada matriz
-        $relacionesFO = $matrizFO->obtenerPorCodigo($codigo_plan);
-        $relacionesFA = $matrizFA->obtenerPorCodigo($codigo_plan);
-        $relacionesDO = $matrizDO->obtenerPorCodigo($codigo_plan);
-        $relacionesDA = $matrizDA->obtenerPorCodigo($codigo_plan);
-
-        // Calcular totales para cada estrategia
-        $totalFO = $this->calcularTotal($relacionesFO);
-        $totalFA = $this->calcularTotal($relacionesFA);
-        $totalDO = $this->calcularTotal($relacionesDO);
-        $totalDA = $this->calcularTotal($relacionesDA);
-
-        // Determinar la estrategia principal (la de mayor puntuación)
-        $estrategias = [
-            'FO' => $totalFO,
-            'FA' => $totalFA,
-            'DO' => $totalDO,
-            'DA' => $totalDA
-        ];
-        $estrategiaPrincipal = array_search(max($estrategias), $estrategias);
-
-        require_once 'views/foda/index.php';
-
-    } catch (Exception $e) {
-        $_SESSION['error_foda'] = 'Error al cargar los datos FODA: ' . $e->getMessage();
-        header("Location:" . base_url . "foda/index");
-        exit();
-    }
-}
-public function guardarRelacion() {
-    if (!isset($_SESSION['plan_codigo'])) {
-        echo json_encode(['success' => false, 'msg' => 'No hay plan seleccionado']);
-        exit;
-    }
-
-    $tipo = $_POST['tipo'] ?? '';
-    $id1 = $_POST['id_elemento1'] ?? null;
-    $id2 = $_POST['id_elemento2'] ?? null;
-    $valor = $_POST['valor'] ?? 0;
-    $codigo = $_SESSION['plan_codigo'];
-
-    $success = false;
-
-    switch ($tipo) {
-        case 'FO':
-            $matriz = new MatrizFO();
-            $matriz->setCodigo($codigo)
-                   ->setValor($valor)
-                   ->setIdFortaleza($id1)
-                   ->setIdOportunidad($id2);
-            // Si existe, actualiza; si no, guarda
-            if ($matriz->existeRelacion($id1, $id2)) {
-                // Buscar el id para actualizar
-                $rel = $matriz->obtenerPorCodigo($codigo);
-                while ($row = $rel->fetch_object()) {
-                    if ($row->id_fortaleza == $id1 && $row->id_oportunidad == $id2) {
-                        $matriz->setIdMatrizFo($row->id_matriz_fo);
-                        $success = $matriz->actualizar();
-                        break;
-                    }
-                }
-            } else {
-                $success = $matriz->guardar();
-            }
-            break;
-        case 'FA':
-            $matriz = new MatrizFA();
-            $matriz->setCodigo($codigo)
-                   ->setValor($valor)
-                   ->setIdFortaleza($id1)
-                   ->setIdAmenaza($id2);
-            if ($matriz->existeRelacion($id1, $id2)) {
-                $rel = $matriz->obtenerPorCodigo($codigo);
-                while ($row = $rel->fetch_object()) {
-                    if ($row->id_fortaleza == $id1 && $row->id_amenaza == $id2) {
-                        $matriz->setIdMatrizFa($row->id_matriz_fa);
-                        $success = $matriz->actualizar();
-                        break;
-                    }
-                }
-            } else {
-                $success = $matriz->guardar();
-            }
-            break;
-        case 'DO':
-            $matriz = new MatrizDO();
-            $matriz->setCodigo($codigo)
-                   ->setValor($valor)
-                   ->setIdDebilidad($id1)
-                   ->setIdOportunidad($id2);
-            if ($matriz->existeRelacion($id1, $id2)) {
-                $rel = $matriz->obtenerPorCodigo($codigo);
-                while ($row = $rel->fetch_object()) {
-                    if ($row->id_debilidad == $id1 && $row->id_oportunidad == $id2) {
-                        $matriz->setId($row->id);
-                        $success = $matriz->actualizar();
-                        break;
-                    }
-                }
-            } else {
-                $success = $matriz->guardar();
-            }
-            break;
-        case 'DA':
-            $matriz = new MatrizDA();
-            $matriz->setCodigo($codigo)
-                   ->setValor($valor)
-                   ->setIdDebilidad($id1)
-                   ->setIdAmenaza($id2);
-            if ($matriz->existeRelacion($id1, $id2)) {
-                $rel = $matriz->obtenerPorCodigo($codigo);
-                while ($row = $rel->fetch_object()) {
-                    if ($row->id_debilidad == $id1 && $row->id_amenaza == $id2) {
-                        $matriz->setIdMatrizDa($row->id_matriz_da);
-                        $success = $matriz->actualizar();
-                        break;
-                    }
-                }
-            } else {
-                $success = $matriz->guardar();
-            }
-            break;
-    }
-
-    echo json_encode(['success' => $success]);
-    exit;
-}
-public function guardarMatrices() {
-    if (!isset($_SESSION['plan_codigo'])) {
-        $_SESSION['error_foda'] = 'No hay plan seleccionado.';
-        header("Location: " . base_url . "foda/index");
-        exit;
-    }
-    $codigo = $_SESSION['plan_codigo'];
-
-    // Guardar FO
-    if (isset($_POST['fo'])) {
-        foreach ($_POST['fo'] as $id_fortaleza => $oportunidades) {
-            foreach ($oportunidades as $id_oportunidad => $valor) {
-                $matriz = new MatrizFO();
-                $matriz->setCodigo($codigo);
-                $matriz->setIdFortaleza($id_fortaleza);
-                $matriz->setIdOportunidad($id_oportunidad);
-                $matriz->setValor($valor);
-
-                // Si existe, actualiza; si no, inserta
-                if ($matriz->existeRelacion($id_fortaleza, $id_oportunidad)) {
-                    // Busca el id para actualizar
-                    $rel = $matriz->obtenerPorCodigo($codigo);
-                    while ($row = $rel->fetch_object()) {
-                        if ($row->id_fortaleza == $id_fortaleza && $row->id_oportunidad == $id_oportunidad) {
-                            $matriz->setIdMatrizFo($row->id_matriz_fo);
-                            $matriz->actualizar();
-                            break;
+                        // FO
+                        if ($matrizFO->existeRelacion($id_fortaleza, $id_oportunidad)) {
+                            $matrizExistente = $matrizFO->obtenerPorCodigo($codigo_plan);
+                            while ($fila = $matrizExistente->fetch_object()) {
+                                if ($fila->id_fortaleza == $id_fortaleza && $fila->id_oportunidad == $id_oportunidad) {
+                                    $matrizFO->setIdMatrizFo($fila->id_matriz_fo); // <-- CORRECTO
+                                    break;
+                                }
+                            }
+                            $resultado = $matrizFO->actualizar();
+                        } else {
+                            $resultado = $matrizFO->guardar();
                         }
+                        $exito = $exito && $resultado;
                     }
-                } else {
-                    $matriz->guardar();
                 }
             }
-        }
-    }
 
-    // Guardar FA
-    if (isset($_POST['fa'])) {
-        foreach ($_POST['fa'] as $id_fortaleza => $amenazas) {
-            foreach ($amenazas as $id_amenaza => $valor) {
-                $matriz = new MatrizFA();
-                $matriz->setCodigo($codigo);
-                $matriz->setIdFortaleza($id_fortaleza);
-                $matriz->setIdAmenaza($id_amenaza);
-                $matriz->setValor($valor);
+            // Procesar matriz FA
+            if (isset($_POST['matrizFA'])) {
+                foreach ($_POST['matrizFA'] as $id_fortaleza => $amenazas) {
+                    foreach ($amenazas as $id_amenaza => $valor) {
+                        $matrizFA = new MatrizFA();
+                        $matrizFA->setCodigo($codigo_plan)
+                                ->setIdFortaleza($id_fortaleza)
+                                ->setIdAmenaza($id_amenaza)
+                                ->setValor($valor);
 
-                if ($matriz->existeRelacion($id_fortaleza, $id_amenaza)) {
-                    $rel = $matriz->obtenerPorCodigo($codigo);
-                    while ($row = $rel->fetch_object()) {
-                        if ($row->id_fortaleza == $id_fortaleza && $row->id_amenaza == $id_amenaza) {
-                            $matriz->setIdMatrizFa($row->id_matriz_fa);
-                            $matriz->actualizar();
-                            break;
+                        // FA
+                        if ($matrizFA->existeRelacion($id_fortaleza, $id_amenaza)) {
+                            $matrizExistente = $matrizFA->obtenerPorCodigo($codigo_plan);
+                            while ($fila = $matrizExistente->fetch_object()) {
+                                if ($fila->id_fortaleza == $id_fortaleza && $fila->id_amenaza == $id_amenaza) {
+                                    $matrizFA->setIdMatrizFa($fila->id_matriz_fa); // <-- CORRECTO
+                                    break;
+                                }
+                            }
+                            $resultado = $matrizFA->actualizar();
+                        } else {
+                            $resultado = $matrizFA->guardar();
                         }
+                        $exito = $exito && $resultado;
                     }
-                } else {
-                    $matriz->guardar();
                 }
             }
-        }
-    }
 
-    // Guardar DO
-    if (isset($_POST['do'])) {
-        foreach ($_POST['do'] as $id_debilidad => $oportunidades) {
-            foreach ($oportunidades as $id_oportunidad => $valor) {
-                $matriz = new MatrizDO();
-                $matriz->setCodigo($codigo);
-                $matriz->setIdDebilidad($id_debilidad);
-                $matriz->setIdOportunidad($id_oportunidad);
-                $matriz->setValor($valor);
+            // Procesar matriz DO
+            if (isset($_POST['matrizDO'])) {
+                foreach ($_POST['matrizDO'] as $id_debilidad => $oportunidades) {
+                    foreach ($oportunidades as $id_oportunidad => $valor) {
+                        $matrizDO = new MatrizDO();
+                        $matrizDO->setCodigo($codigo_plan)
+                                ->setIdDebilidad($id_debilidad)
+                                ->setIdOportunidad($id_oportunidad)
+                                ->setValor($valor);
 
-                if ($matriz->existeRelacion($id_debilidad, $id_oportunidad)) {
-                    $rel = $matriz->obtenerPorCodigo($codigo);
-                    while ($row = $rel->fetch_object()) {
-                        if ($row->id_debilidad == $id_debilidad && $row->id_oportunidad == $id_oportunidad) {
-                            $matriz->setId($row->id);
-                            $matriz->actualizar();
-                            break;
+                        // DO
+                        if ($matrizDO->existeRelacion($id_debilidad, $id_oportunidad)) {
+                            $matrizExistente = $matrizDO->obtenerPorCodigo($codigo_plan);
+                            while ($fila = $matrizExistente->fetch_object()) {
+                                if ($fila->id_debilidad == $id_debilidad && $fila->id_oportunidad == $id_oportunidad) {
+                                    $matrizDO->setId($fila->id); // <-- CORRECTO
+                                    break;
+                                }
+                            }
+                            $resultado = $matrizDO->actualizar();
+                        } else {
+                            $resultado = $matrizDO->guardar();
                         }
+                        $exito = $exito && $resultado;
                     }
-                } else {
-                    $matriz->guardar();
                 }
             }
-        }
-    }
 
-    // Guardar DA
-    if (isset($_POST['da'])) {
-        foreach ($_POST['da'] as $id_debilidad => $amenazas) {
-            foreach ($amenazas as $id_amenaza => $valor) {
-                $matriz = new MatrizDA();
-                $matriz->setCodigo($codigo);
-                $matriz->setIdDebilidad($id_debilidad);
-                $matriz->setIdAmenaza($id_amenaza);
-                $matriz->setValor($valor);
+            // Procesar matriz DA
+            if (isset($_POST['matrizDA'])) {
+                foreach ($_POST['matrizDA'] as $id_debilidad => $amenazas) {
+                    foreach ($amenazas as $id_amenaza => $valor) {
+                        $matrizDA = new MatrizDA();
+                        $matrizDA->setCodigo($codigo_plan)
+                                ->setIdDebilidad($id_debilidad)
+                                ->setIdAmenaza($id_amenaza)
+                                ->setValor($valor);
 
-                if ($matriz->existeRelacion($id_debilidad, $id_amenaza)) {
-                    $rel = $matriz->obtenerPorCodigo($codigo);
-                    while ($row = $rel->fetch_object()) {
-                        if ($row->id_debilidad == $id_debilidad && $row->id_amenaza == $id_amenaza) {
-                            $matriz->setIdMatrizDa($row->id_matriz_da);
-                            $matriz->actualizar();
-                            break;
+                        // DA
+                        if ($matrizDA->existeRelacion($id_debilidad, $id_amenaza)) {
+                            $matrizExistente = $matrizDA->obtenerPorCodigo($codigo_plan);
+                            while ($fila = $matrizExistente->fetch_object()) {
+                                if ($fila->id_debilidad == $id_debilidad && $fila->id_amenaza == $id_amenaza) {
+                                    $matrizDA->setIdMatrizDa($fila->id_matriz_da); // <-- CORRECTO
+                                    break;
+                                }
+                            }
+                            $resultado = $matrizDA->actualizar();
+                        } else {
+                            $resultado = $matrizDA->guardar();
                         }
+                        $exito = $exito && $resultado;
                     }
-                } else {
-                    $matriz->guardar();
                 }
             }
+
+            if ($exito) {
+                $_SESSION['exito_foda'] = 'Matrices FODA guardadas correctamente';
+            } else {
+                $_SESSION['error_foda'] = 'Hubo un error al guardar algunas matrices FODA';
+            }
+
+            header("Location:" . base_url . "foda/index");
+            exit();
+
+        } catch (Exception $e) {
+            $_SESSION['error_foda'] = 'Error al guardar las matrices FODA: ' . $e->getMessage();
+            header("Location:" . base_url . "foda/index");
+            exit();
         }
     }
 
-    $_SESSION['exito_foda'] = 'Matrices FODA guardadas correctamente.';
-    header("Location: " . base_url . "foda/index");
-    exit;
-}
-private function filtrarPorUsuario($result, $id_usuario) {
-    $elementos = [];
-    while ($row = $result->fetch_object()) {
-        if ($row->id_usuario == $id_usuario) {
-            $elementos[] = $row;
+    // Métodos auxiliares
+    private function obtenerElementos($tipo, $codigo_plan, $id_usuario) {
+        $elementos = [];
+        $modelo = new $tipo();
+        $result = $modelo->obtenerPorCodigo($codigo_plan);
+        
+        while ($row = $result->fetch_object()) {
+            if ($row->id_usuario == $id_usuario) {
+                $elementos[] = $row;
+            }
         }
+        
+        return $elementos;
     }
-    return $elementos;
-}
 
-private function calcularTotal($relaciones) {
-    $total = 0;
-    while ($relacion = $relaciones->fetch_object()) {
-        $total += $relacion->valor;
+    private function obtenerMatriz($tipo, $codigo_plan) {
+        $matriz = [];
+        $modelo = new $tipo();
+        $result = $modelo->obtenerPorCodigo($codigo_plan);
+        
+        while ($row = $result->fetch_object()) {
+            $matriz[] = $row;
+        }
+        
+        return $matriz;
     }
-    return $total;
-}
 
+    private function calcularTotalMatriz($matriz) {
+        $total = 0;
+        foreach ($matriz as $relacion) {
+            $total += $relacion->valor;
+        }
+        return $total;
+    }
+
+    private function determinarEstrategiaPrincipal($totales) {
+        $maximo = max($totales);
+        $estrategias = [];
+        
+        foreach ($totales as $tipo => $valor) {
+            if ($valor == $maximo) {
+                $estrategias[] = $tipo;
+            }
+        }
+        
+        if (count($estrategias) > 1) {
+            return 'Múltiples estrategias (' . implode(', ', $estrategias) . ')';
+        }
+        
+        return $estrategias[0];
+    }
 }

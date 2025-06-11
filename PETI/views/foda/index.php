@@ -1,10 +1,9 @@
 <head>
     <link rel="stylesheet" href="<?= base_url ?>assets/css/foda/index.css">
-    <!-- Agregar jQuery para las interacciones AJAX -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         .matriz-container {
-            margin: 20px 0;
+            margin: 30px 0;
             overflow-x: auto;
         }
         .matriz-table {
@@ -19,23 +18,64 @@
         }
         .matriz-table th {
             background-color: #f2f2f2;
-            font-weight: bold;
+            position: sticky;
+            top: 0;
         }
-        .valor-select {
+        .matriz-table select {
             width: 60px;
             padding: 5px;
         }
-        .resultados-estrategicos {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 20px;
+        .total-cell {
+            background-color: #e6f7ff;
+            font-weight: bold;
+        }
+        .resumen-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+        }
+        .resumen-table th, .resumen-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        .resumen-table th {
+            background-color: #f2f2f2;
         }
         .estrategia-principal {
+            background-color: #e6ffed;
             font-weight: bold;
-            color: #2c3e50;
-            font-size: 1.2em;
-            margin-top: 10px;
+        }
+        .alert {
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .btn-guardar {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn-guardar:hover {
+            background-color: #45a049;
+        }
+        .foda-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 5px;
         }
     </style>
 </head>
@@ -47,32 +87,35 @@
     <?php foreach (['fortaleza', 'debilidad', 'oportunidad', 'amenaza'] as $tipo): ?>
         <?php if (isset($_SESSION["{$tipo}_guardada"])): ?>
             <div class="alert <?= $_SESSION["{$tipo}_guardada"] == 'completado' ? 'alert-success' : 'alert-error' ?>">
-                <?= $_SESSION["{$tipo}_guardada"] == 'completado' ? "✅ $tipo guardada correctamente." : "❌ Error al guardar $tipo." ?>
+                <?= $_SESSION["{$tipo}_guardada"] == 'completado' ? "✅ " . ucfirst($tipo) . " guardada correctamente." : "❌ Error al guardar " . $tipo . "." ?>
             </div>
             <?php unset($_SESSION["{$tipo}_guardada"]); ?>
         <?php endif; ?>
 
         <?php if (isset($_SESSION["{$tipo}_eliminada"])): ?>
             <div class="alert <?= $_SESSION["{$tipo}_eliminada"] == 'completado' ? 'alert-success' : 'alert-error' ?>">
-                <?= $_SESSION["{$tipo}_eliminada"] == 'completado' ? "✅ $tipo eliminada correctamente." : "❌ Error al eliminar $tipo." ?>
+                <?= $_SESSION["{$tipo}_eliminada"] == 'completado' ? "✅ " . ucfirst($tipo) . " eliminada correctamente." : "❌ Error al eliminar " . $tipo . "." ?>
             </div>
             <?php unset($_SESSION["{$tipo}_eliminada"]); ?>
         <?php endif; ?>
     <?php endforeach; ?>
 
-    <!-- Mostrar mensajes de las matrices -->
     <?php if (isset($_SESSION['exito_foda'])): ?>
-        <div class="alert alert-success"><?= $_SESSION['exito_foda'] ?></div>
+        <div class="alert alert-success">
+            <?= $_SESSION['exito_foda'] ?>
+        </div>
         <?php unset($_SESSION['exito_foda']); ?>
     <?php endif; ?>
-    
+
     <?php if (isset($_SESSION['error_foda'])): ?>
-        <div class="alert alert-error"><?= $_SESSION['error_foda'] ?></div>
+        <div class="alert alert-error">
+            <?= $_SESSION['error_foda'] ?>
+        </div>
         <?php unset($_SESSION['error_foda']); ?>
     <?php endif; ?>
 
-    <!-- Elementos FODA básicos -->
-    <div class="elementos-foda">
+    <!-- Elementos FODA -->
+    <div class="foda-grid">
         <!-- FORTALEZAS -->
         <div class="foda-section">
             <h2>Fortalezas</h2>
@@ -130,391 +173,394 @@
         </div>
     </div>
 
-    <!-- Matrices de Evaluación Estratégica -->
-    <div class="matrices-estrategicas">
-        <h2>Matriz de Evaluación Estratégica</h2>
-        
-        <!-- Matriz FO - Fortalezas vs Oportunidades -->
-        <div class="matriz-container">
-            <h3>Fortalezas vs Oportunidades (Estrategia Ofensiva)</h3>
-            <p>Las fortalezas se usan para tomar ventaja en cada una de las oportunidades.</p>
-            <p>0=En total desacuerdo, 1= No está de acuerdo, 2= Esta de acuerdo, 3= Bastante de acuerdo y 4=En total acuerdo</p>
-            
-            <table class="matriz-table">
-                <thead>
-                    <tr>
-                        <th>Fortaleza\Oportunidad</th>
-                        <?php foreach ($oportunidades as $oportunidad): ?>
-                            <th><?= htmlspecialchars($oportunidad->oportunidad) ?></th>
-                        <?php endforeach; ?>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($fortalezas as $fortaleza): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($fortaleza->fortaleza) ?></td>
-                            <?php foreach ($oportunidades as $oportunidad): ?>
-                                <td>
-                                    <select class="valor-select valor-fo"
-                                            name="fo[<?= $fortaleza->id ?>][<?= $oportunidad->id ?>]"
-                                            data-fortaleza="<?= $fortaleza->id ?>"
-                                            data-oportunidad="<?= $oportunidad->id ?>">
-                                        <?php for ($i = 0; $i <= 4; $i++): ?>
-                                            <option value="<?= $i ?>"><?= $i ?></option>
-                                        <?php endfor; ?>
-                                    </select>
-                                </td>
-                            <?php endforeach; ?>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-                <tfoot>
-                    <tr class="suma-columnas">
-                        <td><strong>Total</strong></td>
-                        <?php foreach ($oportunidades as $oportunidad): ?>
-                            <td class="suma-col"></td>
-                        <?php endforeach; ?>
-                        <td class="suma-final"><strong>0</strong></td>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
-
-        <!-- Matriz FA - Fortalezas vs Amenazas -->
-        <div class="matriz-container">
-            <h3>Fortalezas vs Amenazas (Estrategia Defensiva)</h3>
-            <p>Las fortalezas evaden el efecto negativo de las amenazas.</p>
-            <p>0=En total desacuerdo, 1= No está de acuerdo, 2= Esta de acuerdo, 3= Bastante de acuerdo y 4=En total acuerdo</p>
-            
-            <table class="matriz-table">
-                <thead>
-                    <tr>
-                        <th>Fortaleza\Amenaza</th>
-                        <?php foreach ($amenazas as $amenaza): ?>
-                            <th><?= htmlspecialchars($amenaza->amenaza) ?></th>
-                        <?php endforeach; ?>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($fortalezas as $fortaleza): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($fortaleza->fortaleza) ?></td>
-                            <?php foreach ($amenazas as $amenaza): ?>
-                                <td>
-                                    <select name="fa[<?= $fortaleza->id ?>][<?= $amenaza->id ?>]" class="valor-select valor-fa" 
-                                            data-fortaleza="<?= $fortaleza->id ?>" 
-                                            data-amenaza="<?= $amenaza->id ?>">
-                                        <?php for ($i = 0; $i <= 4; $i++): ?>
-                                            <option value="<?= $i ?>"><?= $i ?></option>
-                                        <?php endfor; ?>
-                                    </select>
-                                </td>
-                            <?php endforeach; ?>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-                <tfoot>
-                    <tr class="suma-columnas">
-                        <td><strong>Total</strong></td>
-                        <?php foreach ($amenazas as $amenaza): ?>
-                            <td class="suma-col"></td>
-                        <?php endforeach; ?>
-                        <td class="suma-final"><strong>0</strong></td>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
-
-        <!-- Matriz DO - Debilidades vs Oportunidades -->
-        <div class="matriz-container">
-            <h3>Debilidades vs Oportunidades (Estrategia de Reorientación)</h3>
-            <p>Superamos las debilidades tomando ventaja de las oportunidades.</p>
-            <p>0=En total desacuerdo, 1= No está de acuerdo, 2= Esta de acuerdo, 3= Bastante de acuerdo y 4=En total acuerdo</p>
-            
-            <table class="matriz-table">
-                <thead>
-                    <tr>
-                        <th>Debilidad\Oportunidad</th>
-                        <?php foreach ($oportunidades as $oportunidad): ?>
-                            <th><?= htmlspecialchars($oportunidad->oportunidad) ?></th>
-                        <?php endforeach; ?>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($debilidades as $debilidad): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($debilidad->debilidad) ?></td>
-                            <?php foreach ($oportunidades as $oportunidad): ?>
-                                <td>
-                                    <select name="do[<?= $debilidad->id ?>][<?= $oportunidad->id ?>]" class="valor-select valor-do" 
-                                            data-debilidad="<?= $debilidad->id ?>" 
-                                            data-oportunidad="<?= $oportunidad->id ?>">
-                                        <?php for ($i = 0; $i <= 4; $i++): ?>
-                                            <option value="<?= $i ?>"><?= $i ?></option>
-                                        <?php endfor; ?>
-                                    </select>
-                                </td>
-                            <?php endforeach; ?>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-                <tfoot>
-                    <tr class="suma-columnas">
-                        <td><strong>Total</strong></td>
-                        <?php foreach ($oportunidades as $oportunidad): ?>
-                            <td class="suma-col"></td>
-                        <?php endforeach; ?>
-                        <td class="suma-final"><strong>0</strong></td>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
-
-        <!-- Matriz DA - Debilidades vs Amenazas -->
-        <div class="matriz-container">
-            <h3>Debilidades vs Amenazas (Estrategia de Supervivencia)</h3>
-            <p>Las debilidades intensifican notablemente el efecto negativo de las amenazas.</p>
-            <p>0=En total desacuerdo, 1= No está de acuerdo, 2= Esta de acuerdo, 3= Bastante de acuerdo y 4=En total acuerdo</p>
-            
-            <table class="matriz-table">
-                <thead>
-                    <tr>
-                        <th>Debilidad\Amenaza</th>
-                        <?php foreach ($amenazas as $amenaza): ?>
-                            <th><?= htmlspecialchars($amenaza->amenaza) ?></th>
-                        <?php endforeach; ?>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($debilidades as $debilidad): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($debilidad->debilidad) ?></td>
-                            <?php foreach ($amenazas as $amenaza): ?>
-                                <td>
-                                    <select name="da[<?= $debilidad->id ?>][<?= $amenaza->id ?>]" class="valor-select valor-da" 
-                                            data-debilidad="<?= $debilidad->id ?>" 
-                                            data-amenaza="<?= $amenaza->id ?>">
-                                        <?php for ($i = 0; $i <= 4; $i++): ?>
-                                            <option value="<?= $i ?>"><?= $i ?></option>
-                                        <?php endfor; ?>
-                                    </select>
-                                </td>
-                            <?php endforeach; ?>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-                <tfoot>
-                    <tr class="suma-columnas">
-                        <td><strong>Total</strong></td>
-                        <?php foreach ($amenazas as $amenaza): ?>
-                            <td class="suma-col"></td>
-                        <?php endforeach; ?>
-                        <td class="suma-final"><strong>0</strong></td>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
-    </div>
-
-    <!-- Resultados Estratégicos -->
-    <div class="resultados-estrategicos">
-        <h3>Síntesis de Resultados</h3>
-        <table class="matriz-table">
-            <thead>
-                <tr>
-                    <th>Relaciones</th>
-                    <th>Tipología de estrategia</th>
-                    <th>Puntuación</th>
-                    <th>Descripción</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>FO</td>
-                    <td>Estrategia Ofensiva</td>
-                    <td id="totalFO"><?= $totalFO ?></td>
-                    <td>Deberá adoptar estrategias de crecimiento</td>
-                </tr>
-                <tr>
-                    <td>FA</td>
-                    <td>Estrategia Defensiva</td>
-                    <td id="totalFA"><?= $totalFA ?></td>
-                    <td>La empresa está preparada para enfrentarse a las amenazas</td>
-                </tr>
-                <tr>
-                    <td>DO</td>
-                    <td>Estrategia de Reorientación</td>
-                    <td id="totalDO"><?= $totalDO ?></td>
-                    <td>La empresa no puede aprovechar las oportunidades porque carece de preparación adecuada</td>
-                </tr>
-                <tr>
-                    <td>DA</td>
-                    <td>Estrategia de Supervivencia</td>
-                    <td id="totalDA"><?= $totalDA ?></td>
-                    <td>Se enfrenta a amenazas externas sin las fortalezas necesarias para luchar con la competencia</td>
-                </tr>
-            </tbody>
-        </table>
-        
-        <div class="estrategia-principal">
-            La puntuación mayor le indica la estrategia que deberá llevar a cabo: 
-            <span style="color: #e74c3c;"></span>
-        </div>
-    </div>
-
-    <!-- Botón para guardar matrices -->
+    <!-- Formulario para guardar matrices -->
     <form action="<?= base_url ?>foda/guardarMatrices" method="POST">
-        <!-- ...todas las tablas aquí... -->
-        <button type="submit" class="btn btn-primary btn-lg">Guardar Matrices FODA</button>
+
+        <!-- Matriz FO (Fortalezas - Oportunidades) -->
+        <?php if (!empty($fortalezas) && !empty($oportunidades)): ?>
+            <div class="matriz-container">
+                <h2>Matriz FO (Fortalezas - Oportunidades)</h2>
+                <table class="matriz-table">
+                    <thead>
+                        <tr>
+                            <th>Fortaleza \ Oportunidad</th>
+                            <?php foreach($oportunidades as $oportunidad): ?>
+                                <th><?= htmlspecialchars($oportunidad->oportunidad) ?></th>
+                            <?php endforeach; ?>
+                            <th class="total-cell">Total Fila</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+                        $totalFO = 0;
+                        $columnTotalsFO = array_fill(0, count($oportunidades), 0);
+                        ?>
+                        <?php foreach($fortalezas as $fortaleza): ?>
+                            <tr>
+                                <th><?= htmlspecialchars($fortaleza->fortaleza) ?></th>
+                                <?php 
+                                $rowTotal = 0;
+                                foreach($oportunidades as $index => $oportunidad): 
+                                    $valor = 0;
+                                    foreach($matrizFO as $relacion) {
+                                        if (
+                                            isset($relacion->id_fortaleza, $relacion->id_oportunidad, $relacion->id_matriz_fo) &&
+                                            $relacion->id_fortaleza == $fortaleza->id_fortaleza &&
+                                            $relacion->id_oportunidad == $oportunidad->id_oportunidad
+                                        ) {
+                                            $valor = $relacion->valor;
+                                            break;
+                                        }
+                                    }
+                                    $rowTotal += $valor;
+                                    $columnTotalsFO[$index] += $valor;
+                                ?>
+                                    <td>
+                                        <select name="matrizFO[<?= $fortaleza->id_fortaleza ?>][<?= $oportunidad->id_oportunidad ?>]">
+                                            <?php for($i = 0; $i <= 4; $i++): ?>
+                                                <option value="<?= $i ?>" <?= $valor == $i ? 'selected' : '' ?>><?= $i ?></option>
+                                            <?php endfor; ?>
+                                        </select>
+                                    </td>
+                                <?php endforeach; ?>
+                                <td class="total-cell"><?= $rowTotal ?></td>
+                            </tr>
+                        <?php 
+                            $totalFO += $rowTotal;
+                        endforeach; ?>
+                        <tr>
+                            <th class="total-cell">Total Columna</th>
+                            <?php foreach($columnTotalsFO as $total): ?>
+                                <td class="total-cell"><?= $total ?></td>
+                            <?php endforeach; ?>
+                            <td class="total-cell"><?= $totalFO ?></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        <?php else: ?>
+            <p class="alert alert-error">No se puede mostrar la matriz FO. Se requieren fortalezas y oportunidades.</p>
+        <?php endif; ?>
+
+        <!-- Matriz FA (Fortalezas - Amenazas) -->
+        <?php if (!empty($fortalezas) && !empty($amenazas)): ?>
+            <div class="matriz-container">
+                <h2>Matriz FA (Fortalezas - Amenazas)</h2>
+                <table class="matriz-table">
+                    <thead>
+                        <tr>
+                            <th>Fortaleza \ Amenaza</th>
+                            <?php foreach($amenazas as $amenaza): ?>
+                                <th><?= htmlspecialchars($amenaza->amenaza) ?></th>
+                            <?php endforeach; ?>
+                            <th class="total-cell">Total Fila</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+                        $totalFA = 0;
+                        $columnTotalsFA = array_fill(0, count($amenazas), 0);
+                        ?>
+                        <?php foreach($fortalezas as $fortaleza): ?>
+                            <tr>
+                                <th><?= htmlspecialchars($fortaleza->fortaleza) ?></th>
+                                <?php 
+                                $rowTotal = 0;
+                                foreach($amenazas as $index => $amenaza): 
+                                    $valor = 0;
+                                    foreach($matrizFA as $relacion) {
+                                        if (
+                                            isset($relacion->id_fortaleza, $relacion->id_amenaza, $relacion->id_matriz_fa) &&
+                                            $relacion->id_fortaleza == $fortaleza->id_fortaleza &&
+                                            $relacion->id_amenaza == $amenaza->id_amenaza
+                                        ) {
+                                            $valor = $relacion->valor;
+                                            break;
+                                        }
+                                    }
+                                    $rowTotal += $valor;
+                                    $columnTotalsFA[$index] += $valor;
+                                ?>
+                                    <td>
+                                        <select name="matrizFA[<?= $fortaleza->id_fortaleza ?>][<?= $amenaza->id_amenaza ?>]">
+                                            <?php for($i = 0; $i <= 4; $i++): ?>
+                                                <option value="<?= $i ?>" <?= $valor == $i ? 'selected' : '' ?>><?= $i ?></option>
+                                            <?php endfor; ?>
+                                        </select>
+                                    </td>
+                                <?php endforeach; ?>
+                                <td class="total-cell"><?= $rowTotal ?></td>
+                            </tr>
+                        <?php 
+                            $totalFA += $rowTotal;
+                        endforeach; ?>
+                        <tr>
+                            <th class="total-cell">Total Columna</th>
+                            <?php foreach($columnTotalsFA as $total): ?>
+                                <td class="total-cell"><?= $total ?></td>
+                            <?php endforeach; ?>
+                            <td class="total-cell"><?= $totalFA ?></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        <?php else: ?>
+            <p class="alert alert-error">No se puede mostrar la matriz FA. Se requieren fortalezas y amenazas.</p>
+        <?php endif; ?>
+
+        <!-- Matriz DO (Debilidades - Oportunidades) -->
+        <?php if (!empty($debilidades) && !empty($oportunidades)): ?>
+            <div class="matriz-container">
+                <h2>Matriz DO (Debilidades - Oportunidades)</h2>
+                <table class="matriz-table">
+                    <thead>
+                        <tr>
+                            <th>Debilidad \ Oportunidad</th>
+                            <?php foreach($oportunidades as $oportunidad): ?>
+                                <th><?= htmlspecialchars($oportunidad->oportunidad) ?></th>
+                            <?php endforeach; ?>
+                            <th class="total-cell">Total Fila</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+                        $totalDO = 0;
+                        $columnTotalsDO = array_fill(0, count($oportunidades), 0);
+                        ?>
+                        <?php foreach($debilidades as $debilidad): ?>
+                            <tr>
+                                <th><?= htmlspecialchars($debilidad->debilidad) ?></th>
+                                <?php 
+                                $rowTotal = 0;
+                                foreach($oportunidades as $index => $oportunidad): 
+                                    $valor = 0;
+                                    foreach($matrizDO as $relacion) {
+                                        if (
+                                            isset($relacion->id_debilidad, $relacion->id_oportunidad, $relacion->id_matriz_do) &&
+                                            $relacion->id_debilidad == $debilidad->id_debilidad &&
+                                            $relacion->id_oportunidad == $oportunidad->id_oportunidad
+                                        ) {
+                                            $valor = $relacion->valor;
+                                            break;
+                                        }
+                                    }
+                                    $rowTotal += $valor;
+                                    $columnTotalsDO[$index] += $valor;
+                                ?>
+                                    <td>
+                                        <select name="matrizDO[<?= $debilidad->id_debilidad ?>][<?= $oportunidad->id_oportunidad ?>]">
+                                            <?php for($i = 0; $i <= 4; $i++): ?>
+                                                <option value="<?= $i ?>" <?= $valor == $i ? 'selected' : '' ?>><?= $i ?></option>
+                                            <?php endfor; ?>
+                                        </select>
+                                    </td>
+                                <?php endforeach; ?>
+                                <td class="total-cell"><?= $rowTotal ?></td>
+                            </tr>
+                        <?php 
+                            $totalDO += $rowTotal;
+                        endforeach; ?>
+                        <tr>
+                            <th class="total-cell">Total Columna</th>
+                            <?php foreach($columnTotalsDO as $total): ?>
+                                <td class="total-cell"><?= $total ?></td>
+                            <?php endforeach; ?>
+                            <td class="total-cell"><?= $totalDO ?></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        <?php else: ?>
+            <p class="alert alert-error">No se puede mostrar la matriz DO. Se requieren debilidades y oportunidades.</p>
+        <?php endif; ?>
+
+        <!-- Matriz DA (Debilidades - Amenazas) -->
+        <?php if (!empty($debilidades) && !empty($amenazas)): ?>
+            <div class="matriz-container">
+                <h2>Matriz DA (Debilidades - Amenazas)</h2>
+                <table class="matriz-table">
+                    <thead>
+                        <tr>
+                            <th>Debilidad \ Amenaza</th>
+                            <?php foreach($amenazas as $amenaza): ?>
+                                <th><?= htmlspecialchars($amenaza->amenaza) ?></th>
+                            <?php endforeach; ?>
+                            <th class="total-cell">Total Fila</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+                        $totalDA = 0;
+                        $columnTotalsDA = array_fill(0, count($amenazas), 0);
+                        ?>
+                        <?php foreach($debilidades as $debilidad): ?>
+                            <tr>
+                                <th><?= htmlspecialchars($debilidad->debilidad) ?></th>
+                                <?php 
+                                $rowTotal = 0;
+                                foreach($amenazas as $index => $amenaza): 
+                                    $valor = 0;
+                                    foreach($matrizDA as $relacion) {
+                                        if (
+                                            isset($relacion->id_debilidad, $relacion->id_amenaza, $relacion->id_matriz_da) &&
+                                            $relacion->id_debilidad == $debilidad->id_debilidad &&
+                                            $relacion->id_amenaza == $amenaza->id_amenaza
+                                        ) {
+                                            $valor = $relacion->valor;
+                                            break;
+                                        }
+                                    }
+                                    $rowTotal += $valor;
+                                    $columnTotalsDA[$index] += $valor;
+                                ?>
+                                    <td>
+                                        <select name="matrizDA[<?= $debilidad->id_debilidad ?>][<?= $amenaza->id_amenaza ?>]">
+                                            <?php for($i = 0; $i <= 4; $i++): ?>
+                                                <option value="<?= $i ?>" <?= $valor == $i ? 'selected' : '' ?>><?= $i ?></option>
+                                            <?php endfor; ?>
+                                        </select>
+                                    </td>
+                                <?php endforeach; ?>
+                                <td class="total-cell"><?= $rowTotal ?></td>
+                            </tr>
+                        <?php 
+                            $totalDA += $rowTotal;
+                        endforeach; ?>
+                        <tr>
+                            <th class="total-cell">Total Columna</th>
+                            <?php foreach($columnTotalsDA as $total): ?>
+                                <td class="total-cell"><?= $total ?></td>
+                            <?php endforeach; ?>
+                            <td class="total-cell"><?= $totalDA ?></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        <?php else: ?>
+            <p class="alert alert-error">No se puede mostrar la matriz DA. Se requieren debilidades y amenazas.</p>
+        <?php endif; ?>
+
+        <!-- Resumen de estrategias -->
+        <div class="resumen-container">
+            <h2>Resumen de Estrategias</h2>
+            <table class="resumen-table">
+                <thead>
+                    <tr>
+                        <th>Matriz</th>
+                        <th>Total</th>
+                        <th>Tipo de Estrategia</th>
+                        <th>Descripción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr <?= strpos($estrategiaPrincipal, 'FO') !== false ? 'class="estrategia-principal"' : '' ?>>
+                        <td>FO (Fortalezas - Oportunidades)</td>
+                        <td><?= $totalFO ?></td>
+                        <td>Estrategia Ofensiva</td>
+                        <td>Usar fortalezas para aprovechar oportunidades</td>
+                    </tr>
+                    <tr <?= strpos($estrategiaPrincipal, 'FA') !== false ? 'class="estrategia-principal"' : '' ?>>
+                        <td>FA (Fortalezas - Amenazas)</td>
+                        <td><?= $totalFA ?></td>
+                        <td>Estrategia Defensiva</td>
+                        <td>Usar fortalezas para evitar amenazas</td>
+                    </tr>
+                    <tr <?= strpos($estrategiaPrincipal, 'DO') !== false ? 'class="estrategia-principal"' : '' ?>>
+                        <td>DO (Debilidades - Oportunidades)</td>
+                        <td><?= $totalDO ?></td>
+                        <td>Estrategia de Reorientación</td>
+                        <td>Superar debilidades para aprovechar oportunidades</td>
+                    </tr>
+                    <tr <?= strpos($estrategiaPrincipal, 'DA') !== false ? 'class="estrategia-principal"' : '' ?>>
+                        <td>DA (Debilidades - Amenazas)</td>
+                        <td><?= $totalDA ?></td>
+                        <td>Estrategia de Supervivencia</td>
+                        <td>Minimizar debilidades y evitar amenazas</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div> <!-- Fin resumen-container -->
+
+        <!-- Estrategia a usar -->
+        <p id="estrategia-a-usar" style="text-align:center; margin-top:10px; font-weight:bold;">
+            Estrategia a usar: 
+            <span>
+                <?php
+                    $mayor = max($totalFO, $totalFA, $totalDO, $totalDA);
+                    if ($mayor == $totalFO) echo 'FO (Fortalezas - Oportunidades)';
+                    elseif ($mayor == $totalFA) echo 'FA (Fortalezas - Amenazas)';
+                    elseif ($mayor == $totalDO) echo 'DO (Debilidades - Oportunidades)';
+                    else echo 'DA (Debilidades - Amenazas)';
+                ?>
+            </span>
+        </p>
+
+        <!-- Botón de guardar -->
+        <div class="form-actions">
+            <button type="submit" class="btn-guardar">Guardar Matrices FODA</button>
+        </div>
     </form>
 </div>
 
-<!-- JavaScript para manejar las matrices -->
 <script>
 $(document).ready(function() {
-    // Función para enviar los valores de las matrices
-    function enviarValor(tipo, id1, id2, valor) {
-        $.post("<?= base_url ?>foda/guardarRelacion", {
-            tipo: tipo,
-            id_elemento1: id1,
-            id_elemento2: id2,
-            valor: valor
-        }, function(response) {
-            // Puedes agregar notificación de éxito si lo deseas
-        }).fail(function() {
-            alert('Error al guardar el valor. Por favor intente nuevamente.');
+    $('.matriz-table select').change(function() {
+        var table = $(this).closest('table');
+        var colIndex = $(this).closest('td').index();
+
+        // Calcular total de fila
+        table.find('tbody tr').each(function() {
+            var rowTotal = 0;
+            $(this).find('td select').each(function() {
+                rowTotal += parseInt($(this).val()) || 0;
+            });
+            $(this).find('.total-cell').text(rowTotal);
         });
-    }
 
-    // Manejar cambios en FO
-    $('.valor-fo').change(function() {
-        var fortaleza = $(this).data('fortaleza');
-        var oportunidad = $(this).data('oportunidad');
-        var valor = $(this).val();
-        enviarValor('FO', fortaleza, oportunidad, valor);
-    });
-
-    // Manejar cambios en FA
-    $('.valor-fa').change(function() {
-        var fortaleza = $(this).data('fortaleza');
-        var amenaza = $(this).data('amenaza');
-        var valor = $(this).val();
-        enviarValor('FA', fortaleza, amenaza, valor);
-    });
-
-    // Manejar cambios en DO
-    $('.valor-do').change(function() {
-        var debilidad = $(this).data('debilidad');
-        var oportunidad = $(this).data('oportunidad');
-        var valor = $(this).val();
-        enviarValor('DO', debilidad, oportunidad, valor);
-    });
-
-    // Manejar cambios en DA
-    $('.valor-da').change(function() {
-        var debilidad = $(this).data('debilidad');
-        var amenaza = $(this).data('amenaza');
-        var valor = $(this).val();
-        enviarValor('DA', debilidad, amenaza, valor);
-    });
-
-    // Cargar valores existentes al cargar la página
-    function cargarValoresExistentes() {
-        $.getJSON("<?= base_url ?>foda/obtenerValoresMatrices", {codigo: "<?= $_SESSION['plan_codigo'] ?>"}, function(data) {
-            // FO
-            $.each(data.fo, function(index, item) {
-                $('.valor-fo[data-fortaleza="'+item.id_fortaleza+'"][data-oportunidad="'+item.id_oportunidad+'"]').val(item.valor);
+        // Calcular total de columna
+        table.find('thead th').each(function(i) {
+            if (i === 0 || $(this).hasClass('total-cell')) return;
+            var colTotal = 0;
+            table.find('tbody tr').not(':last').each(function() {
+                var cell = $(this).find('td').eq(i - 1);
+                if (cell.length && cell.find('select').length) {
+                    colTotal += parseInt(cell.find('select').val()) || 0;
+                }
             });
-            
-            // FA
-            $.each(data.fa, function(index, item) {
-                $('.valor-fa[data-fortaleza="'+item.id_fortaleza+'"][data-amenaza="'+item.id_amenaza+'"]').val(item.valor);
-            });
-            
-            // DO
-            $.each(data.do, function(index, item) {
-                $('.valor-do[data-debilidad="'+item.id_debilidad+'"][data-oportunidad="'+item.id_oportunidad+'"]').val(item.valor);
-            });
-            
-            // DA
-            $.each(data.da, function(index, item) {
-                $('.valor-da[data-debilidad="'+item.id_debilidad+'"][data-amenaza="'+item.id_amenaza+'"]').val(item.valor);
-            });
+            table.find('tr:last td').eq(i - 1).text(colTotal);
         });
-    }
 
-    // Función para sumar columnas de una matriz (corrigiendo el desfase)
-    function sumarColumnasMatriz(selectorTabla) {
-        var $tabla = $(selectorTabla);
-        var filas = $tabla.find('tbody tr');
-        var numCols = filas.first().find('td').length - 1; // Restar la columna de nombres
-        var totalFinal = 0;
-        for (var col = 1; col <= numCols; col++) { // Empieza en 1 para saltar la columna de nombres
-            var suma = 0;
-            filas.each(function() {
-                var val = parseInt($(this).find('td').eq(col).find('select').val(), 10);
-                if (!isNaN(val)) suma += val;
-            });
-            $tabla.find('tfoot .suma-col').eq(col - 1).text(suma); // col-1 porque suma-col no tiene la columna de nombres
-            totalFinal += suma;
+        // Calcular total general
+        var generalTotal = 0;
+        table.find('tr:not(:last) td.total-cell').each(function() {
+            generalTotal += parseInt($(this).text()) || 0;
+        });
+        table.find('tr:last td.total-cell:last').text(generalTotal);
+
+        // ACTUALIZAR TOTALES EN EL RESUMEN DE ESTRATEGIAS
+        var matrizNombre = table.closest('.matriz-container').find('h2').text();
+        var resumenRows = $('.resumen-table tbody tr');
+        if (matrizNombre.includes('FO')) {
+            resumenRows.eq(0).find('td').eq(1).text(generalTotal);
+        } else if (matrizNombre.includes('FA')) {
+            resumenRows.eq(1).find('td').eq(1).text(generalTotal);
+        } else if (matrizNombre.includes('DO')) {
+            resumenRows.eq(2).find('td').eq(1).text(generalTotal);
+        } else if (matrizNombre.includes('DA')) {
+            resumenRows.eq(3).find('td').eq(1).text(generalTotal);
         }
-        $tabla.find('tfoot .suma-final').html('<strong>' + totalFinal + '</strong>');
-    }
 
-    // Función para actualizar todas las sumas de columnas
-    function actualizarSumas() {
-        // FO
-        sumarColumnasMatriz('.matriz-container:eq(0) .matriz-table');
-        // FA
-        sumarColumnasMatriz('.matriz-container:eq(1) .matriz-table');
-        // DO
-        sumarColumnasMatriz('.matriz-container:eq(2) .matriz-table');
-        // DA
-        sumarColumnasMatriz('.matriz-container:eq(3) .matriz-table');
-        // Actualiza la tabla de resultados
-        actualizarTotalesResultados();
-    }
-
-    function actualizarTotalesResultados() {
-        // Obtén los totales finales de cada matriz
-        var totalFO = parseInt($('.matriz-container:eq(0) .suma-final').text(), 10) || 0;
-        var totalFA = parseInt($('.matriz-container:eq(1) .suma-final').text(), 10) || 0;
-        var totalDO = parseInt($('.matriz-container:eq(2) .suma-final').text(), 10) || 0;
-        var totalDA = parseInt($('.matriz-container:eq(3) .suma-final').text(), 10) || 0;
-
-        // Actualiza la tabla de resultados
-        $('#totalFO').text(totalFO);
-        $('#totalFA').text(totalFA);
-        $('#totalDO').text(totalDO);
-        $('#totalDA').text(totalDA);
-
-        // Determina la estrategia principal solo si hay algún total mayor a 0
-        var max = Math.max(totalFO, totalFA, totalDO, totalDA);
-        var estrategia = '';
-        if (max > 0) {
-            if (max === totalFO) estrategia = 'FO (Estrategia Ofensiva)';
-            else if (max === totalFA) estrategia = 'FA (Estrategia Defensiva)';
-            else if (max === totalDO) estrategia = 'DO (Estrategia de Reorientación)';
-            else if (max === totalDA) estrategia = 'DA (Estrategia de Supervivencia)';
-        }
-        $('.estrategia-principal span').text(estrategia);
-    }
-
-    // Llama a actualizarSumas después de cargar valores y en cada cambio
-    cargarValoresExistentes = (function(orig) {
-        return function() {
-            orig();
-            setTimeout(actualizarSumas, 300); // Espera a que se llenen los selects
-        };
-    })(cargarValoresExistentes);
-
-    $('.valor-select').change(function() {
-        actualizarSumas();
+        // ACTUALIZAR ESTRATEGIA A USAR
+        var totales = [
+            {nombre: 'FO (Fortalezas - Oportunidades)', valor: parseInt(resumenRows.eq(0).find('td').eq(1).text()) || 0},
+            {nombre: 'FA (Fortalezas - Amenazas)', valor: parseInt(resumenRows.eq(1).find('td').eq(1).text()) || 0},
+            {nombre: 'DO (Debilidades - Oportunidades)', valor: parseInt(resumenRows.eq(2).find('td').eq(1).text()) || 0},
+            {nombre: 'DA (Debilidades - Amenazas)', valor: parseInt(resumenRows.eq(3).find('td').eq(1).text()) || 0}
+        ];
+        var mayor = totales.reduce(function(prev, current) {
+            return (prev.valor > current.valor) ? prev : current;
+        });
+        $('#estrategia-a-usar span').text(mayor.nombre);
     });
-
-    // Inicializa sumas al cargar
-    setTimeout(actualizarSumas, 500);
-
-    cargarValoresExistentes();
 });
 </script>
