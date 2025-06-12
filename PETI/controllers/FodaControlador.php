@@ -138,16 +138,16 @@ class FodaControlador {
                     foreach ($oportunidades as $id_oportunidad => $valor) {
                         $matrizDO = new MatrizDO();
                         $matrizDO->setCodigo($codigo_plan)
-                                ->setIdDebilidad($id_debilidad)
-                                ->setIdOportunidad($id_oportunidad)
-                                ->setValor($valor);
+                                 ->setIdDebilidad($id_debilidad)
+                                 ->setIdOportunidad($id_oportunidad)
+                                 ->setValor($valor);
 
                         // DO
                         if ($matrizDO->existeRelacion($id_debilidad, $id_oportunidad)) {
                             $matrizExistente = $matrizDO->obtenerPorCodigo($codigo_plan);
                             while ($fila = $matrizExistente->fetch_object()) {
                                 if ($fila->id_debilidad == $id_debilidad && $fila->id_oportunidad == $id_oportunidad) {
-                                    $matrizDO->setId($fila->id); // <-- CORRECTO
+                                    $matrizDO->setIdMatrizDo($fila->id_matriz_do); // <-- CORRECTO
                                     break;
                                 }
                             }

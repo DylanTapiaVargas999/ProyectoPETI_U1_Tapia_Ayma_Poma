@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Versión del servidor:         10.4.32-MariaDB - mariadb.org binary distribution
+-- Versión del servidor:         10.4.27-MariaDB - mariadb.org binary distribution
 -- SO del servidor:              Win64
--- HeidiSQL Versión:             12.10.0.7000
+-- HeidiSQL Versión:             12.4.0.6659
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `amenaza` (
   PRIMARY KEY (`id_amenaza`),
   KEY `id_usuario` (`id_usuario`),
   CONSTRAINT `amenaza_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- La exportación de datos fue deseleccionada.
 
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS `debilidad` (
   PRIMARY KEY (`id_debilidad`),
   KEY `id_usuario` (`id_usuario`),
   CONSTRAINT `debilidad_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- La exportación de datos fue deseleccionada.
 
@@ -210,7 +210,7 @@ CREATE TABLE IF NOT EXISTS `fortaleza` (
   PRIMARY KEY (`id_fortaleza`),
   KEY `id_usuario` (`id_usuario`),
   CONSTRAINT `fortaleza_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- La exportación de datos fue deseleccionada.
 
@@ -239,23 +239,23 @@ CREATE TABLE IF NOT EXISTS `matriz_da` (
   KEY `id_amenaza` (`id_amenaza`),
   CONSTRAINT `matriz_da_ibfk_1` FOREIGN KEY (`id_debilidad`) REFERENCES `debilidad` (`id_debilidad`),
   CONSTRAINT `matriz_da_ibfk_2` FOREIGN KEY (`id_amenaza`) REFERENCES `amenaza` (`id_amenaza`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- La exportación de datos fue deseleccionada.
 
 -- Volcando estructura para tabla bd_plan.matriz_do
 CREATE TABLE IF NOT EXISTS `matriz_do` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_matriz_do` int(11) NOT NULL AUTO_INCREMENT,
   `codigo` varchar(10) NOT NULL,
   `valor` tinyint(1) NOT NULL CHECK (`valor` between 0 and 4),
   `id_debilidad` int(11) NOT NULL,
   `id_oportunidad` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`id_matriz_do`) USING BTREE,
   KEY `id_debilidad` (`id_debilidad`),
   KEY `id_oportunidad` (`id_oportunidad`),
   CONSTRAINT `matriz_do_ibfk_1` FOREIGN KEY (`id_debilidad`) REFERENCES `debilidad` (`id_debilidad`),
   CONSTRAINT `matriz_do_ibfk_2` FOREIGN KEY (`id_oportunidad`) REFERENCES `oportunidad` (`id_oportunidad`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- La exportación de datos fue deseleccionada.
 
@@ -271,7 +271,7 @@ CREATE TABLE IF NOT EXISTS `matriz_fa` (
   KEY `id_amenaza` (`id_amenaza`),
   CONSTRAINT `matriz_fa_ibfk_1` FOREIGN KEY (`id_fortaleza`) REFERENCES `fortaleza` (`id_fortaleza`),
   CONSTRAINT `matriz_fa_ibfk_2` FOREIGN KEY (`id_amenaza`) REFERENCES `amenaza` (`id_amenaza`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- La exportación de datos fue deseleccionada.
 
@@ -287,7 +287,7 @@ CREATE TABLE IF NOT EXISTS `matriz_fo` (
   KEY `id_oportunidad` (`id_oportunidad`),
   CONSTRAINT `matriz_fo_ibfk_1` FOREIGN KEY (`id_fortaleza`) REFERENCES `fortaleza` (`id_fortaleza`),
   CONSTRAINT `matriz_fo_ibfk_2` FOREIGN KEY (`id_oportunidad`) REFERENCES `oportunidad` (`id_oportunidad`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- La exportación de datos fue deseleccionada.
 
@@ -339,7 +339,7 @@ CREATE TABLE IF NOT EXISTS `oportunidad` (
   PRIMARY KEY (`id_oportunidad`),
   KEY `id_usuario` (`id_usuario`),
   CONSTRAINT `oportunidad_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- La exportación de datos fue deseleccionada.
 
@@ -352,7 +352,7 @@ CREATE TABLE IF NOT EXISTS `plan_estrategico` (
   PRIMARY KEY (`id`),
   KEY `FK__usuario` (`id_usuario`),
   CONSTRAINT `FK__usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- La exportación de datos fue deseleccionada.
 
@@ -408,7 +408,7 @@ CREATE TABLE IF NOT EXISTS `usuario` (
   `imagen` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `uq_correo` (`correo`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- La exportación de datos fue deseleccionada.
 

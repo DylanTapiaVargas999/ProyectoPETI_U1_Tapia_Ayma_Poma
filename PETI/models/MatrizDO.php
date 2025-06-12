@@ -2,7 +2,7 @@
 require_once 'config/db.php';
 
 class MatrizDO {
-    private $id;
+    private $id_matriz_do;
     private $valor;
     private $codigo;
     private $id_debilidad;
@@ -14,8 +14,8 @@ class MatrizDO {
     }
 
     // Getters
-    public function getId() {
-        return $this->id;
+    public function getIdMatrizDo() {
+        return $this->id_matriz_do;
     }
 
     public function getValor() {
@@ -35,8 +35,8 @@ class MatrizDO {
     }
 
     // Setters
-    public function setId($id) {
-        $this->id = intval($id);
+    public function setIdMatrizDo($id) {
+        $this->id_matriz_do = intval($id);
         return $this;
     }
 
@@ -72,8 +72,8 @@ class MatrizDO {
 
         $sql = "INSERT INTO matriz_do VALUES(
             NULL, 
-            '{$this->getCodigo()}', 
             {$this->getValor()}, 
+            '{$this->getCodigo()}', 
             {$this->getIdDebilidad()}, 
             {$this->getIdOportunidad()}
         )";
@@ -81,7 +81,7 @@ class MatrizDO {
         $guardado = $this->db->query($sql);
         
         if ($guardado) {
-            $this->id = $this->db->insert_id;
+            $this->id_matriz_do = $this->db->insert_id;
             return true;
         }
         return false;
@@ -95,33 +95,33 @@ class MatrizDO {
 
     public function eliminar() {
         $sql = "DELETE FROM matriz_do 
-                WHERE id = {$this->getId()}";
+                WHERE id_matriz_do = {$this->getIdMatrizDo()}";
         return $this->db->query($sql);
     }
 
     public function actualizar() {
         $sql = "UPDATE matriz_do SET 
                 valor = {$this->getValor()}
-                WHERE id = {$this->getId()}";
+                WHERE id_matriz_do = {$this->getIdMatrizDo()}";
         return $this->db->query($sql);
     }
 
-    public function obtenerPorId($id) {
+    public function obtenerPorId($id_matriz_do) {
         $sql = "SELECT * FROM matriz_do 
-                WHERE id = $id 
+                WHERE id_matriz_do = $id_matriz_do 
                 LIMIT 1";
         $resultado = $this->db->query($sql);
         return $resultado ? $resultado->fetch_object() : false;
     }
 
-public function existeRelacion($id_debilidad, $id_oportunidad) {
-    $sql = "SELECT id FROM matriz_do 
-            WHERE id_debilidad = $id_debilidad 
-            AND id_oportunidad = $id_oportunidad 
-            AND codigo = '{$this->codigo}'
-            LIMIT 1";
-    $resultado = $this->db->query($sql);
-    return $resultado && $resultado->num_rows > 0;
-}
+    public function existeRelacion($id_debilidad, $id_oportunidad) {
+        $sql = "SELECT id_matriz_do FROM matriz_do 
+                WHERE id_debilidad = $id_debilidad 
+                AND id_oportunidad = $id_oportunidad 
+                AND codigo = '{$this->codigo}'
+                LIMIT 1";
+        $resultado = $this->db->query($sql);
+        return $resultado && $resultado->num_rows > 0;
+    }
 }
 ?>
