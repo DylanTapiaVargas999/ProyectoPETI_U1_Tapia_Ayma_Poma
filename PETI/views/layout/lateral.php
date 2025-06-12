@@ -123,7 +123,7 @@
                     </li>
                     <li class="menu-item">
                         <i class="fas fa-table"></i>
-                        <a href="#">11. Matriz CAME</a>
+                        <a href="<?=base_url?>came/index">11. Matriz CAME</a>
                     </li>
                     <li class="menu-item">
                         <i class="fas fa-file-alt"></i>

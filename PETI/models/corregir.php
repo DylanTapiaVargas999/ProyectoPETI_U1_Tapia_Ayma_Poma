@@ -1,0 +1,112 @@
+<?php
+require_once 'config/db.php';
+
+class Corregir {
+    private $id_corregir;
+    private $corregir;
+    private $codigo;
+    private $id_usuario;
+    private $db;
+
+    public function __construct() {
+        $this->db = Database::conexion();
+    }
+
+    // Getters
+    public function getIdCorregir() {
+        return $this->id_corregir;
+    }
+
+    public function getCorregir() {
+        return $this->corregir;
+    }
+
+    public function getCodigo() {
+        return $this->codigo;
+    }
+
+    public function getIdUsuario() {
+        return $this->id_usuario;
+    }
+
+    // Setters
+    public function setIdCorregir($id) {
+        $this->id_corregir = intval($id);
+        return $this;
+    }
+
+    public function setCorregir($corregir) {
+        $this->corregir = $this->db->real_escape_string(trim($corregir));
+        return $this;
+    }
+
+    public function setCodigo($codigo) {
+        $this->codigo = $this->db->real_escape_string(trim($codigo));
+        return $this;
+    }
+
+    public function setIdUsuario($id_usuario) {
+        $this->id_usuario = intval($id_usuario);
+        return $this;
+    }
+
+    // Métodos CRUD
+    public function guardar() {
+        if (empty($this->corregir) || empty($this->codigo) || empty($this->id_usuario)) {
+            return false;
+        }
+
+        $sql = "INSERT INTO corregir VALUES(
+            NULL, 
+            '{$this->getCorregir()}', 
+            '{$this->getCodigo()}', 
+            {$this->getIdUsuario()}
+        )";
+        
+        $guardado = $this->db->query($sql);
+        
+        if ($guardado) {
+            $this->id_corregir = $this->db->insert_id;
+            return true;
+        }
+        return false;
+    }
+
+    public function obtenerPorUsuario($id_usuario) {
+        $sql = "SELECT * FROM corregir 
+                WHERE id_usuario = $id_usuario 
+                ORDER BY id_corregir DESC";
+        return $this->db->query($sql);
+    }
+
+    public function obtenerPorCodigo($codigo) {
+        $sql = "SELECT * FROM corregir 
+                WHERE codigo = '{$this->db->real_escape_string($codigo)}'";
+        return $this->db->query($sql);
+    }
+
+    public function eliminar() {
+        $sql = "DELETE FROM corregir 
+                WHERE id_corregir = {$this->getIdCorregir()} 
+                AND id_usuario = {$this->getIdUsuario()}";
+        return $this->db->query($sql);
+    }
+
+    public function actualizar() {
+        $sql = "UPDATE corregir SET 
+                corregir = '{$this->getCorregir()}'
+                WHERE id_corregir = {$this->getIdCorregir()} 
+                AND id_usuario = {$this->getIdUsuario()}";
+        return $this->db->query($sql);
+    }
+
+    public function obtenerPorIdYUsuario($id_corregir, $id_usuario) {
+        $sql = "SELECT * FROM corregir 
+                WHERE id_corregir = $id_corregir 
+                AND id_usuario = $id_usuario 
+                LIMIT 1";
+        $resultado = $this->db->query($sql);
+        return $resultado ? $resultado->fetch_object() : false;
+    }
+}
+?>
