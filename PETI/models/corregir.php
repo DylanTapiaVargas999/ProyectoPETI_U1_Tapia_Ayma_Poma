@@ -3,6 +3,7 @@ require_once 'config/db.php';
 
 class Corregir {
     private $id_corregir;
+    private $id_debilidad;
     private $corregir;
     private $codigo;
     private $id_usuario;
@@ -15,6 +16,10 @@ class Corregir {
     // Getters
     public function getIdCorregir() {
         return $this->id_corregir;
+    }
+
+    public function getIdDebilidad() {
+        return $this->id_debilidad;
     }
 
     public function getCorregir() {
@@ -35,6 +40,11 @@ class Corregir {
         return $this;
     }
 
+    public function setIdDebilidad($id_debilidad) {
+        $this->id_debilidad = intval($id_debilidad);
+        return $this;
+    }
+
     public function setCorregir($corregir) {
         $this->corregir = $this->db->real_escape_string(trim($corregir));
         return $this;
@@ -52,12 +62,13 @@ class Corregir {
 
     // Métodos CRUD
     public function guardar() {
-        if (empty($this->corregir) || empty($this->codigo) || empty($this->id_usuario)) {
+        if (empty($this->corregir) || empty($this->codigo) || empty($this->id_usuario) || empty($this->id_debilidad)) {
             return false;
         }
 
         $sql = "INSERT INTO corregir VALUES(
             NULL, 
+            {$this->getIdDebilidad()},
             '{$this->getCorregir()}', 
             '{$this->getCodigo()}', 
             {$this->getIdUsuario()}
@@ -95,14 +106,16 @@ class Corregir {
     public function actualizar() {
         $sql = "UPDATE corregir SET 
                 corregir = '{$this->getCorregir()}'
-                WHERE id_corregir = {$this->getIdCorregir()} 
-                AND id_usuario = {$this->getIdUsuario()}";
-        return $this->db->query($sql);
+                WHERE id_debilidad = {$this->getIdDebilidad()} 
+                AND id_usuario = {$this->getIdUsuario()}
+                AND codigo = '{$this->getCodigo()}'";
+        $this->db->query($sql);
+        return $this->db->affected_rows > 0;
     }
 
-    public function obtenerPorIdYUsuario($id_corregir, $id_usuario) {
+    public function obtenerPorDebilidadYUsuario($id_debilidad, $id_usuario) {
         $sql = "SELECT * FROM corregir 
-                WHERE id_corregir = $id_corregir 
+                WHERE id_debilidad = $id_debilidad 
                 AND id_usuario = $id_usuario 
                 LIMIT 1";
         $resultado = $this->db->query($sql);

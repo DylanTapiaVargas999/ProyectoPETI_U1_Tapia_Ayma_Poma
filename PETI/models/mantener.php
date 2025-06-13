@@ -3,6 +3,7 @@ require_once 'config/db.php';
 
 class Mantener {
     private $id_mantener;
+    private $id_fortaleza;
     private $mantener;
     private $codigo;
     private $id_usuario;
@@ -15,6 +16,10 @@ class Mantener {
     // Getters
     public function getIdMantener() {
         return $this->id_mantener;
+    }
+
+    public function getIdFortaleza() {
+        return $this->id_fortaleza;
     }
 
     public function getMantener() {
@@ -35,6 +40,11 @@ class Mantener {
         return $this;
     }
 
+    public function setIdFortaleza($id_fortaleza) {
+        $this->id_fortaleza = intval($id_fortaleza);
+        return $this;
+    }
+
     public function setMantener($mantener) {
         $this->mantener = $this->db->real_escape_string(trim($mantener));
         return $this;
@@ -52,12 +62,13 @@ class Mantener {
 
     // Métodos CRUD
     public function guardar() {
-        if (empty($this->mantener) || empty($this->codigo) || empty($this->id_usuario)) {
+        if (empty($this->mantener) || empty($this->codigo) || empty($this->id_usuario) || empty($this->id_fortaleza)) {
             return false;
         }
 
         $sql = "INSERT INTO mantener VALUES(
             NULL, 
+            {$this->getIdFortaleza()},
             '{$this->getMantener()}', 
             '{$this->getCodigo()}', 
             {$this->getIdUsuario()}
@@ -95,14 +106,25 @@ class Mantener {
     public function actualizar() {
         $sql = "UPDATE mantener SET 
                 mantener = '{$this->getMantener()}'
-                WHERE id_mantener = {$this->getIdMantener()} 
-                AND id_usuario = {$this->getIdUsuario()}";
-        return $this->db->query($sql);
+                WHERE id_fortaleza = {$this->getIdFortaleza()} 
+                AND id_usuario = {$this->getIdUsuario()}
+                AND codigo = '{$this->getCodigo()}'";
+        $this->db->query($sql);
+        return $this->db->affected_rows > 0;
     }
 
     public function obtenerPorIdYUsuario($id_mantener, $id_usuario) {
         $sql = "SELECT * FROM mantener 
                 WHERE id_mantener = $id_mantener 
+                AND id_usuario = $id_usuario 
+                LIMIT 1";
+        $resultado = $this->db->query($sql);
+        return $resultado ? $resultado->fetch_object() : false;
+    }
+
+    public function obtenerPorFortalezaYUsuario($id_fortaleza, $id_usuario) {
+        $sql = "SELECT * FROM mantener 
+                WHERE id_fortaleza = $id_fortaleza 
                 AND id_usuario = $id_usuario 
                 LIMIT 1";
         $resultado = $this->db->query($sql);

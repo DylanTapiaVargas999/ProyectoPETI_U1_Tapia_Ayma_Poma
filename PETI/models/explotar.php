@@ -3,6 +3,7 @@ require_once 'config/db.php';
 
 class Explotar {
     private $id_explotar;
+    private $id_oportunidad;
     private $explotar;
     private $codigo;
     private $id_usuario;
@@ -15,6 +16,10 @@ class Explotar {
     // Getters
     public function getIdExplotar() {
         return $this->id_explotar;
+    }
+
+    public function getIdOportunidad() {
+        return $this->id_oportunidad;
     }
 
     public function getExplotar() {
@@ -35,6 +40,11 @@ class Explotar {
         return $this;
     }
 
+    public function setIdOportunidad($id_oportunidad) {
+        $this->id_oportunidad = intval($id_oportunidad);
+        return $this;
+    }
+
     public function setExplotar($explotar) {
         $this->explotar = $this->db->real_escape_string(trim($explotar));
         return $this;
@@ -52,12 +62,13 @@ class Explotar {
 
     // Métodos CRUD
     public function guardar() {
-        if (empty($this->explotar) || empty($this->codigo) || empty($this->id_usuario)) {
+        if (empty($this->explotar) || empty($this->codigo) || empty($this->id_usuario) || empty($this->id_oportunidad)) {
             return false;
         }
 
         $sql = "INSERT INTO explotar VALUES(
             NULL, 
+            {$this->getIdOportunidad()},
             '{$this->getExplotar()}', 
             '{$this->getCodigo()}', 
             {$this->getIdUsuario()}
@@ -95,14 +106,25 @@ class Explotar {
     public function actualizar() {
         $sql = "UPDATE explotar SET 
                 explotar = '{$this->getExplotar()}'
-                WHERE id_explotar = {$this->getIdExplotar()} 
-                AND id_usuario = {$this->getIdUsuario()}";
-        return $this->db->query($sql);
+                WHERE id_oportunidad = {$this->getIdOportunidad()} 
+                AND id_usuario = {$this->getIdUsuario()}
+                AND codigo = '{$this->getCodigo()}'";
+        $this->db->query($sql);
+        return $this->db->affected_rows > 0;
     }
 
     public function obtenerPorIdYUsuario($id_explotar, $id_usuario) {
         $sql = "SELECT * FROM explotar 
                 WHERE id_explotar = $id_explotar 
+                AND id_usuario = $id_usuario 
+                LIMIT 1";
+        $resultado = $this->db->query($sql);
+        return $resultado ? $resultado->fetch_object() : false;
+    }
+
+    public function obtenerPorOportunidadYUsuario($id_oportunidad, $id_usuario) {
+        $sql = "SELECT * FROM explotar 
+                WHERE id_oportunidad = $id_oportunidad 
                 AND id_usuario = $id_usuario 
                 LIMIT 1";
         $resultado = $this->db->query($sql);

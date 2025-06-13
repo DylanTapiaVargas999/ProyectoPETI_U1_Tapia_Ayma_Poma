@@ -3,6 +3,7 @@ require_once 'config/db.php';
 
 class Afrontar {
     private $id_afrontar;
+    private $id_amenaza;
     private $afrontar;
     private $codigo;
     private $id_usuario;
@@ -15,6 +16,10 @@ class Afrontar {
     // Getters
     public function getIdAfrontar() {
         return $this->id_afrontar;
+    }
+
+    public function getIdAmenaza() {
+        return $this->id_amenaza;
     }
 
     public function getAfrontar() {
@@ -35,6 +40,11 @@ class Afrontar {
         return $this;
     }
 
+    public function setIdAmenaza($id_amenaza) {
+        $this->id_amenaza = intval($id_amenaza);
+        return $this;
+    }
+
     public function setAfrontar($afrontar) {
         $this->afrontar = $this->db->real_escape_string(trim($afrontar));
         return $this;
@@ -52,12 +62,13 @@ class Afrontar {
 
     // Métodos CRUD
     public function guardar() {
-        if (empty($this->afrontar) || empty($this->codigo) || empty($this->id_usuario)) {
+        if (empty($this->afrontar) || empty($this->codigo) || empty($this->id_usuario) || empty($this->id_amenaza)) {
             return false;
         }
 
         $sql = "INSERT INTO afrontar VALUES(
             NULL, 
+            {$this->getIdAmenaza()},
             '{$this->getAfrontar()}', 
             '{$this->getCodigo()}', 
             {$this->getIdUsuario()}
@@ -95,14 +106,25 @@ class Afrontar {
     public function actualizar() {
         $sql = "UPDATE afrontar SET 
                 afrontar = '{$this->getAfrontar()}'
-                WHERE id_afrontar = {$this->getIdAfrontar()} 
-                AND id_usuario = {$this->getIdUsuario()}";
-        return $this->db->query($sql);
+                WHERE id_amenaza = {$this->getIdAmenaza()} 
+                AND id_usuario = {$this->getIdUsuario()}
+                AND codigo = '{$this->getCodigo()}'";
+        $this->db->query($sql);
+        return $this->db->affected_rows > 0;
     }
 
     public function obtenerPorIdYUsuario($id_afrontar, $id_usuario) {
         $sql = "SELECT * FROM afrontar 
                 WHERE id_afrontar = $id_afrontar 
+                AND id_usuario = $id_usuario 
+                LIMIT 1";
+        $resultado = $this->db->query($sql);
+        return $resultado ? $resultado->fetch_object() : false;
+    }
+
+    public function obtenerPorAmenazaYUsuario($id_amenaza, $id_usuario) {
+        $sql = "SELECT * FROM afrontar 
+                WHERE id_amenaza = $id_amenaza 
                 AND id_usuario = $id_usuario 
                 LIMIT 1";
         $resultado = $this->db->query($sql);

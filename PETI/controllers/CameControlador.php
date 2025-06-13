@@ -3,6 +3,10 @@ require_once 'models/Afrontar.php';
 require_once 'models/Corregir.php';
 require_once 'models/Mantener.php';
 require_once 'models/Explotar.php';
+require_once 'models/Fortaleza.php';
+require_once 'models/Debilidad.php';
+require_once 'models/Oportunidad.php';
+require_once 'models/Amenaza.php';
 
 class CameControlador {
 
@@ -25,21 +29,22 @@ class CameControlador {
             $id_usuario = $_SESSION['identity']->id;
             $codigo_plan = $_SESSION['plan_codigo'];
 
-            // Obtener elementos de cada categoría
-            $afrontar = new Afrontar();
-            $amenazas = $afrontar->obtenerPorCodigo($codigo_plan);
+            // Obtener elementos FODA originales
+            $fortaleza = new Fortaleza();
+            $fortalezas = $fortaleza->obtenerPorCodigo($codigo_plan);
 
-            $corregir = new Corregir();
-            $debilidades = $corregir->obtenerPorCodigo($codigo_plan);
+            $debilidad = new Debilidad();
+            $debilidades = $debilidad->obtenerPorCodigo($codigo_plan);
 
-            $mantener = new Mantener();
-            $fortalezas = $mantener->obtenerPorCodigo($codigo_plan);
+            $oportunidad = new Oportunidad();
+            $oportunidades = $oportunidad->obtenerPorCodigo($codigo_plan);
 
-            $explotar = new Explotar();
-            $oportunidades = $explotar->obtenerPorCodigo($codigo_plan);
+            $amenaza = new Amenaza();
+            $amenazas = $amenaza->obtenerPorCodigo($codigo_plan);
 
             // Verificar errores en la consulta
-            if ($amenazas === false || $debilidades === false || $fortalezas === false || $oportunidades === false) {
+            if ($fortalezas === false || $debilidades === false || 
+                $oportunidades === false || $amenazas === false) {
                 $_SESSION['error_came'] = 'Error al cargar los elementos FODA';
             }
 
@@ -94,7 +99,7 @@ class CameControlador {
             switch ($tipo) {
                 case 'corregir':
                     $modelo = new Corregir();
-                    $modelo->setIdCorregir($id)
+                    $modelo->setIdDebilidad($id) // <-- Aquí va el id_debilidad
                            ->setCorregir($accion)
                            ->setCodigo($codigoPlan)
                            ->setIdUsuario($id_usuario);
@@ -102,7 +107,7 @@ class CameControlador {
                 
                 case 'afrontar':
                     $modelo = new Afrontar();
-                    $modelo->setIdAfrontar($id)
+                    $modelo->setIdAmenaza($id) // <-- Aquí va el id_amenaza
                            ->setAfrontar($accion)
                            ->setCodigo($codigoPlan)
                            ->setIdUsuario($id_usuario);
@@ -110,7 +115,7 @@ class CameControlador {
                 
                 case 'mantener':
                     $modelo = new Mantener();
-                    $modelo->setIdMantener($id)
+                    $modelo->setIdFortaleza($id) // <-- Aquí va el id_fortaleza
                           ->setMantener($accion)
                           ->setCodigo($codigoPlan)
                           ->setIdUsuario($id_usuario);
@@ -118,71 +123,19 @@ class CameControlador {
                 
                 case 'explotar':
                     $modelo = new Explotar();
-                    $modelo->setIdExplotar($id)
+                    $modelo->setIdOportunidad($id) // <-- Aquí va el id_oportunidad
                           ->setExplotar($accion)
                           ->setCodigo($codigoPlan)
                           ->setIdUsuario($id_usuario);
                     break;
             }
 
+            // Intentar actualizar, si falla (no existe), intentar guardar
             if (!$modelo->actualizar()) {
-                throw new Exception("Error al actualizar la acción para {$tipo} ID {$id}");
+                if (!$modelo->guardar()) {
+                    throw new Exception("Error al guardar/actualizar la acción para {$tipo} ID {$id}");
+                }
             }
         }
-    }
-
-    public function eliminar() {
-        if (!isset($_SESSION['identity']) || !isset($_GET['id']) || !isset($_GET['tipo'])) {
-            $_SESSION['error_came'] = 'Acceso no autorizado';
-            header("Location:" . base_url . "usuario/iniciarSesion");
-            exit();
-        }
-
-        try {
-            $id = (int)$_GET['id'];
-            $tipo = $_GET['tipo'];
-            $id_usuario = $_SESSION['identity']->id;
-
-            switch ($tipo) {
-                case 'corregir':
-                    $modelo = new Corregir();
-                    $modelo->setIdCorregir($id)
-                           ->setIdUsuario($id_usuario);
-                    break;
-                
-                case 'afrontar':
-                    $modelo = new Afrontar();
-                    $modelo->setIdAfrontar($id)
-                           ->setIdUsuario($id_usuario);
-                    break;
-                
-                case 'mantener':
-                    $modelo = new Mantener();
-                    $modelo->setIdMantener($id)
-                          ->setIdUsuario($id_usuario);
-                    break;
-                
-                case 'explotar':
-                    $modelo = new Explotar();
-                    $modelo->setIdExplotar($id)
-                          ->setIdUsuario($id_usuario);
-                    break;
-                
-                default:
-                    throw new Exception('Tipo de elemento no válido');
-            }
-
-            if ($modelo->eliminar()) {
-                $_SESSION['came_eliminado'] = 'completado';
-            } else {
-                throw new Exception('Error al eliminar el elemento');
-            }
-        } catch (Exception $e) {
-            $_SESSION['came_eliminado'] = 'fallido';
-            $_SESSION['error_came'] = $e->getMessage();
-        }
-
-        header("Location:" . base_url . "came/index");
-        exit();
     }
 }
