@@ -5,6 +5,7 @@ class PlanEstrategico {
     private $codigo;
     private $titulo;
     private $id_usuario;
+    private $fecha; // NUEVO
     private $db;
 
     public function __construct() {
@@ -47,14 +48,24 @@ class PlanEstrategico {
         return $this;
     }
 
+    public function getFecha() {
+        return $this->fecha;
+    }
+    public function setFecha($fecha) {
+        $this->fecha = $fecha;
+        return $this;
+    }
+
     public function guardar() {
         $codigo = $this->generarCodigoUnico();
+        $fecha = date('Y-m-d'); // Fecha actual
 
         $sql = "INSERT INTO plan_estrategico VALUES(
             NULL,
             '$codigo',
             '{$this->getTitulo()}',
-            {$this->getIdUsuario()}
+            {$this->getIdUsuario()},
+            '$fecha'
         )";
 
         $guardar = $this->db->query($sql);
@@ -109,5 +120,9 @@ class PlanEstrategico {
         return $codigo;
     }
 
-
+    public function obtenerPorCodigo($codigo, $id_usuario) {
+        $sql = "SELECT * FROM plan_estrategico WHERE codigo = '$codigo' AND id_usuario = $id_usuario LIMIT 1";
+        $result = $this->db->query($sql);
+        return $result ? $result->fetch_object() : null;
+    }
 }

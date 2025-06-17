@@ -554,12 +554,12 @@ document.addEventListener('DOMContentLoaded', function() {
             let cuadrante;
             if (producto.tcm >= 10 && producto.prm >= 1) {
                 cuadrante = 0; // Estrella
-            } else if (producto.tcm >= 10) {
+            } else if (producto.tcm >= 10 && producto.prm < 1) {
                 cuadrante = 1; // Interrogante
-            } else if (producto.prm >= 1) {
-                cuadrante = 2; // Vaca
-            } else {
-                cuadrante = 3; // Perro
+            } else if (producto.tcm < 10 && producto.prm < 1) {
+                cuadrante = 2; // Perro
+            } else if (producto.tcm < 10 && producto.prm >= 1) {
+                cuadrante = 3; // Vaca
             }
             
             // Tamaño de la burbuja basado en % de ventas (mínimo 15, máximo 40)
@@ -735,18 +735,20 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Agregar controles de zoom
+        // Agregar controles de zoom alineados arriba a la derecha
         const zoomControls = `
-            <div class="btn-group mt-3">
-                <button class="btn btn-sm btn-outline-primary" id="zoomInBtn">
-                    <i class="fas fa-search-plus"></i> Zoom In
-                </button>
-                <button class="btn btn-sm btn-outline-primary" id="zoomOutBtn">
-                    <i class="fas fa-search-minus"></i> Zoom Out
-                </button>
-                <button class="btn btn-sm btn-outline-secondary" id="resetZoomBtn">
-                    <i class="fas fa-sync-alt"></i> Reset
-                </button>
+            <div class="d-flex justify-content-end" style="margin-bottom: 1rem;">
+                <div class="btn-group">
+                    <button class="btn btn-sm btn-outline-primary" id="zoomInBtn">
+                        <i class="fas fa-search-plus"></i> Zoom In
+                    </button>
+                    <button class="btn btn-sm btn-outline-primary" id="zoomOutBtn">
+                        <i class="fas fa-search-minus"></i> Zoom Out
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary" id="resetZoomBtn">
+                        <i class="fas fa-sync-alt"></i> Reset
+                    </button>
+                </div>
             </div>
         `;
         document.querySelector('#bcgChart').parentNode.insertAdjacentHTML('beforeend', zoomControls);
@@ -768,6 +770,9 @@ document.addEventListener('DOMContentLoaded', function() {
         agregarLeyendaBCG();
     }
     
+
+
+
     // Función para mostrar análisis del producto
     function mostrarAnalisisProducto(producto) {
         let estrategia = '';
@@ -870,18 +875,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <h6><span class="badge bg-primary">⭐ Estrellas</span></h6>
-                            <p>Alto crecimiento, alta participación. Son líderes en mercados en crecimiento. Requieren inversión para mantener su posición.</p>
-                            
                             <h6><span class="badge bg-info">❓ Interrogantes</span></h6>
                             <p>Alto crecimiento, baja participación. Requieren análisis para decidir si invertir o retirarse.</p>
-                        </div>
-                        <div class="col-md-6">
-                            <h6><span class="badge bg-warning text-dark">🐄 Vacas</span></h6>
-                            <p>Bajo crecimiento, alta participación. Generan más efectivo del que consumen. Son la "base" del negocio.</p>
-                            
+
                             <h6><span class="badge bg-danger">🐕 Perros</span></h6>
                             <p>Bajo crecimiento, baja participación. Generalmente generan poco o ningún beneficio neto.</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><span class="badge bg-primary">⭐ Estrellas</span></h6>
+                            <p>Alto crecimiento, alta participación. Son líderes en mercados en crecimiento. Requieren inversión para mantener su posición.</p>
+
+                            <h6><span class="badge bg-warning text-dark">🐄 Vacas</span></h6>
+                            <p>Bajo crecimiento, alta participación. Generan más efectivo del que consumen. Son la "base" del negocio.</p>
                         </div>
                     </div>
                     <hr>
@@ -975,3 +980,95 @@ document.addEventListener('DOMContentLoaded', function() {
     actualizarMatrizBCG();
 });
 </script>
+
+
+    <!-- Mensajes de Debilidad -->
+    <?php foreach (['debilidad_guardada', 'debilidad_actualizada', 'debilidad_eliminada'] as $key): ?>
+        <?php if (isset($_SESSION[$key])): ?>
+            <div class="alert <?= $_SESSION[$key] == 'completado' ? 'alert-success' : 'alert-danger' ?>">
+                <?= $_SESSION[$key] == 'completado' ? '✅ Debilidad procesada correctamente.' : '❌ Hubo un error con la debilidad.' ?>
+            </div>
+            <?php unset($_SESSION[$key]); ?>
+        <?php endif; ?>
+    <?php endforeach; ?>
+
+    <!-- Mensajes de Fortaleza -->
+    <?php foreach (['fortaleza_guardada', 'fortaleza_actualizada', 'fortaleza_eliminada'] as $key): ?>
+        <?php if (isset($_SESSION[$key])): ?>
+            <div class="alert <?= $_SESSION[$key] == 'completado' ? 'alert-success' : 'alert-danger' ?>">
+                <?= $_SESSION[$key] == 'completado' ? '✅ Fortaleza procesada correctamente.' : '❌ Hubo un error con la fortaleza.' ?>
+            </div>
+            <?php unset($_SESSION[$key]); ?>
+        <?php endif; ?>
+    <?php endforeach; ?>
+
+    <!-- Mensajes de Encuesta -->
+    <?php foreach (['encuesta_guardada', 'encuesta_actualizada'] as $key): ?>
+        <?php if (isset($_SESSION[$key])): ?>
+            <div class="alert <?= $_SESSION[$key] == 'completado' ? 'alert-success' : 'alert-danger' ?>">
+                <?= $_SESSION[$key] == 'completado' ? '✅ Encuesta guardada correctamente.' : '❌ Error al guardar la encuesta.' ?>
+            </div>
+            <?php unset($_SESSION[$key]); ?>
+        <?php endif; ?>
+    <?php endforeach; ?>
+
+    <!-- Debilidades -->
+    <h2 class="mt-4">Debilidades</h2>
+    <div class="mb-3">
+        <?php if ($edicionDebilidad && $debilidadActual): ?>
+            <form action="<?= base_url ?>bcg/guardarDebilidad" method="POST">
+                <input type="hidden" name="id_debilidad" value="<?= $debilidadActual->id_debilidad ?>">
+                <textarea name="debilidad" class="form-control mb-2" required><?= htmlspecialchars($debilidadActual->debilidad) ?></textarea>
+                <button type="submit" class="btn btn-success">Guardar Cambios</button>
+                <a href="<?= base_url ?>bcg/index" class="btn btn-secondary">Cancelar</a>
+            </form>
+        <?php else: ?>
+            <form action="<?= base_url ?>bcg/guardarDebilidad" method="POST">
+                <textarea name="debilidad" class="form-control mb-2" placeholder="Describe una debilidad..." required></textarea>
+                <button type="submit" class="btn btn-primary">Agregar Debilidad</button>
+            </form>
+        <?php endif; ?>
+    </div>
+
+    <ul class="list-group mb-4">
+        <?php foreach ($debilidades as $d): ?>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <?= htmlspecialchars($d['debilidad']) ?>
+<a href="<?= base_url ?>bcg/index&editarDebilidad=<?= $d['id_debilidad'] ?>">Editar</a>
+<a href="<?= base_url ?>bcg/eliminarDebilidad&id=<?= $d['id_debilidad'] ?>" ...>Eliminar</a>
+
+            </li>
+        <?php endforeach; ?>
+    </ul>
+
+    <!-- Fortalezas -->
+    <h2>Fortalezas</h2>
+    <div class="mb-3">
+        <?php if ($edicionFortaleza && $fortalezaActual): ?>
+            <form action="<?= base_url ?>bcg/guardarFortaleza" method="POST">
+                <input type="hidden" name="id_fortaleza" value="<?= $fortalezaActual->id_fortaleza ?>">
+                <textarea name="fortaleza" class="form-control mb-2" required><?= htmlspecialchars($fortalezaActual->fortaleza) ?></textarea>
+                <button type="submit" class="btn btn-success">Guardar Cambios</button>
+                <a href="<?= base_url ?>bcg/index" class="btn btn-secondary">Cancelar</a>
+            </form>
+        <?php else: ?>
+            <form action="<?= base_url ?>bcg/guardarFortaleza" method="POST">
+                <textarea name="fortaleza" class="form-control mb-2" placeholder="Describe una fortaleza..." required></textarea>
+                <button type="submit" class="btn btn-primary">Agregar Fortaleza</button>
+            </form>
+        <?php endif; ?>
+    </div>
+
+    <ul class="list-group mb-4">
+        <?php foreach ($fortalezas as $f): ?>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <?= htmlspecialchars($f['fortaleza']) ?>
+<a href="<?= base_url ?>bcg/index&editarFortaleza=<?= $f['id_fortaleza'] ?>">Editar</a>
+<a href="<?= base_url ?>bcg/eliminarFortaleza&id=<?= $f['id_fortaleza'] ?>" ...>Eliminar</a>
+
+            </li>
+        <?php endforeach; ?>
+    </ul>
+
+    
+</div>

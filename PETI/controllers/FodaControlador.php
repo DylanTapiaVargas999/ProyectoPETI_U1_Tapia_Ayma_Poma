@@ -34,21 +34,36 @@ class FodaControlador {
             $amenazas = $this->obtenerElementos('Amenaza', $codigo_plan, $id_usuario);
 
             // Obtener matrices existentes
-            $matrizFO = $this->obtenerMatriz('MatrizFO', $codigo_plan);
-            $matrizFA = $this->obtenerMatriz('MatrizFA', $codigo_plan);
-            $matrizDO = $this->obtenerMatriz('MatrizDO', $codigo_plan);
-            $matrizDA = $this->obtenerMatriz('MatrizDA', $codigo_plan);
+            $matrizFO_data = $this->obtenerMatriz('MatrizFO', $codigo_plan); // Renombrado para claridad, opcional
+            $matrizFA_data = $this->obtenerMatriz('MatrizFA', $codigo_plan); // Renombrado para claridad, opcional
+            $matrizDO_data = $this->obtenerMatriz('MatrizDO', $codigo_plan); // Renombrado para claridad, opcional
+            $matrizDA_data = $this->obtenerMatriz('MatrizDA', $codigo_plan); // Renombrado para claridad, opcional
 
             // Calcular totales estratégicos
-            $totales = [
-                'FO' => $this->calcularTotalMatriz($matrizFO),
-                'FA' => $this->calcularTotalMatriz($matrizFA),
-                'DO' => $this->calcularTotalMatriz($matrizDO),
-                'DA' => $this->calcularTotalMatriz($matrizDA)
+            $totales_array = [ // Renombrado para claridad, opcional. El original $totales también funciona.
+                'FO' => $this->calcularTotalMatriz($matrizFO_data),
+                'FA' => $this->calcularTotalMatriz($matrizFA_data),
+                'DO' => $this->calcularTotalMatriz($matrizDO_data),
+                'DA' => $this->calcularTotalMatriz($matrizDA_data)
             ];
 
             // Determinar estrategia principal
-            $estrategiaPrincipal = $this->determinarEstrategiaPrincipal($totales);
+            $estrategiaPrincipal = $this->determinarEstrategiaPrincipal($totales_array);
+
+            // *** INICIO DE LA SOLUCIÓN PARA VARIABLES INDEFINIDAS ***
+            // Extraer los totales a variables individuales que la vista espera
+            $totalFO = $totales_array['FO'];
+            $totalFA = $totales_array['FA'];
+            $totalDO = $totales_array['DO'];
+            $totalDA = $totales_array['DA'];
+
+            // Pasar también los datos de las matrices si la vista los necesita para listar detalles
+            // Si tu vista usa $matrizFO para los datos de la matriz, puedes usar:
+            $matrizFO = $matrizFO_data; // O el nombre original si no renombraste arriba
+            $matrizFA = $matrizFA_data;
+            $matrizDO = $matrizDO_data;
+            $matrizDA = $matrizDA_data;
+            // *** FIN DE LA SOLUCIÓN PARA VARIABLES INDEFINIDAS ***
 
             require_once 'views/foda/index.php';
 

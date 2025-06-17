@@ -500,13 +500,17 @@
             <button type="submit" class="btn-guardar">Guardar Matrices FODA</button>
         </div>
     </form>
-</div>
+
+
 
 <script>
+// Variables globales
+var tipoEstrategiaFODA = '';
+var descripcionEstrategiaFODA = '';
+
 $(document).ready(function() {
     $('.matriz-table select').change(function() {
         var table = $(this).closest('table');
-        var colIndex = $(this).closest('td').index();
 
         // Calcular total de fila
         table.find('tbody tr').each(function() {
@@ -537,7 +541,7 @@ $(document).ready(function() {
         });
         table.find('tr:last td.total-cell:last').text(generalTotal);
 
-        // ACTUALIZAR TOTALES EN EL RESUMEN DE ESTRATEGIAS
+        // Actualizar resumen
         var matrizNombre = table.closest('.matriz-container').find('h2').text();
         var resumenRows = $('.resumen-table tbody tr');
         if (matrizNombre.includes('FO')) {
@@ -550,7 +554,7 @@ $(document).ready(function() {
             resumenRows.eq(3).find('td').eq(1).text(generalTotal);
         }
 
-        // ACTUALIZAR ESTRATEGIA A USAR
+        // Actualizar estrategia a usar
         var totales = [
             {nombre: 'FO (Fortalezas - Oportunidades)', valor: parseInt(resumenRows.eq(0).find('td').eq(1).text()) || 0},
             {nombre: 'FA (Fortalezas - Amenazas)', valor: parseInt(resumenRows.eq(1).find('td').eq(1).text()) || 0},
@@ -562,5 +566,49 @@ $(document).ready(function() {
         });
         $('#estrategia-a-usar span').text(mayor.nombre);
     });
+
+    // GUARDAR EN LOCALSTORAGE DESPUÉS DE HACER CLIC EN GUARDAR
+    $('.btn-guardar').click(function(e) {
+        // Identificar el mayor antes de guardar
+        var resumenRows = $('.resumen-table tbody tr');
+        var totales = [
+            {matriz: 'FO', valor: parseInt(resumenRows.eq(0).find('td').eq(1).text()) || 0},
+            {matriz: 'FA', valor: parseInt(resumenRows.eq(1).find('td').eq(1).text()) || 0},
+            {matriz: 'DO', valor: parseInt(resumenRows.eq(2).find('td').eq(1).text()) || 0},
+            {matriz: 'DA', valor: parseInt(resumenRows.eq(3).find('td').eq(1).text()) || 0}
+        ];
+        
+        var mayorEstrategia = totales.reduce(function(prev, current) {
+            return (prev.valor > current.valor) ? prev : current;
+        });
+
+        // Guardar tipo y descripción según la matriz ganadora
+        if (mayorEstrategia.matriz === 'FO') {
+            tipoEstrategiaFODA = 'Estrategia Ofensiva';
+            descripcionEstrategiaFODA = 'Usar fortalezas para aprovechar oportunidades';
+        } else if (mayorEstrategia.matriz === 'FA') {
+            tipoEstrategiaFODA = 'Estrategia Defensiva';
+            descripcionEstrategiaFODA = 'Usar fortalezas para evitar amenazas';
+        } else if (mayorEstrategia.matriz === 'DO') {
+            tipoEstrategiaFODA = 'Estrategia de Reorientación';
+            descripcionEstrategiaFODA = 'Superar debilidades para aprovechar oportunidades';
+        } else if (mayorEstrategia.matriz === 'DA') {
+            tipoEstrategiaFODA = 'Estrategia de Supervivencia';
+            descripcionEstrategiaFODA = 'Minimizar debilidades y evitar amenazas';
+        }
+
+        // GUARDAR EN LOCALSTORAGE
+        localStorage.setItem('tipoEstrategiaFODA', tipoEstrategiaFODA);
+        localStorage.setItem('descripcionEstrategiaFODA', descripcionEstrategiaFODA);
+    });
 });
+
+// Funciones para acceder desde el resumen
+function obtenerTipoEstrategia() {
+    return localStorage.getItem('tipoEstrategiaFODA') || '';
+}
+
+function obtenerDescripcionEstrategia() {
+    return localStorage.getItem('descripcionEstrategiaFODA') || '';
+}
 </script>

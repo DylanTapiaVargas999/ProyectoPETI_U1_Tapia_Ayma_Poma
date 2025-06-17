@@ -47,6 +47,7 @@
                     <th>ID</th>
                     <th>Código</th>
                     <th>Título</th>
+                    <th>Fecha</th> <!-- NUEVO -->
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -60,6 +61,9 @@
                         <td><?= $p->id ?></td>
                         <td><?= $p->codigo ?></td>
                         <td><?= $p->titulo ?></td>
+                        <td>
+                            <?= $p->fecha ? date('d/m/Y', strtotime($p->fecha)) : '-' ?>
+                        </td> <!-- NUEVO -->
                         <td>
                             <a href="<?= base_url ?>planEstrategico/editar&id=<?= $p->id ?>" class="btn btn-warning btn-sm">Editar</a>
                             <a href="<?= base_url ?>planEstrategico/eliminar&id=<?= $p->id ?>" class="btn btn-danger btn-sm" onclick="return confirm('¿Seguro que deseas eliminar este plan?')">Eliminar</a>

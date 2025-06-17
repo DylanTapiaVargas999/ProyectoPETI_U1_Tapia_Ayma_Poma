@@ -166,12 +166,26 @@ class usuarioControlador {
             exit;
         }
     }
-
+    
     public function cerrarSesion() {
         if (isset($_SESSION['identity'])) {
             unset($_SESSION['identity']);
         }
-
-        header("Location: " . base_url);
+        
+        // Mostrar página de limpieza que se redirige automáticamente
+        echo "<!DOCTYPE html>
+        <html>
+        <head><title>Cerrando sesión...</title></head>
+        <body>
+        <p>Cerrando sesión...</p>
+        <script>
+            localStorage.removeItem('tipoEstrategiaFODA');
+            localStorage.removeItem('descripcionEstrategiaFODA');
+            setTimeout(function() {
+                window.location.href = '" . base_url . "';
+            }, 100);
+        </script>
+        </body>
+        </html>";
     }
 }

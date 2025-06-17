@@ -127,7 +127,7 @@
                     </li>
                     <li class="menu-item">
                         <i class="fas fa-file-alt"></i>
-                        <a href="#">12. Resumen</a>
+                        <a href="<?=base_url?>resumen/index">12. Resumen Estratégico</a>
                     </li>
                 </ul>
             </div>

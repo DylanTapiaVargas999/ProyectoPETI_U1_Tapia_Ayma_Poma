@@ -1,6 +1,8 @@
 <?php
 require_once 'models/Producto.php';
 require_once 'helpers/utils.php';
+require_once 'models/debilidad.php';
+require_once 'models/fortaleza.php';
 
 class BCGControlador {
     private $producto;
@@ -24,27 +26,52 @@ class BCGControlador {
         Utilidades::verificarSesion();
         Utilidades::verificarPlan();
 
-        // Forzar recarga de datos desde la base de datos
         $this->producto = new Producto();
         $productos = $this->producto->obtenerPorPlan(
             $_SESSION['plan_codigo'], 
             $_SESSION['identity']->id
         );
-        // Verificar si estamos editando un producto específico
+
+        // --- NUEVO: Cargar debilidades y fortalezas ---
+        require_once 'models/debilidad.php';
+        require_once 'models/fortaleza.php';
+        $debilidad = new Debilidad();
+        $fortaleza = new Fortaleza();
+
+        $debilidades = $debilidad->obtenerPorCodigo($_SESSION['plan_codigo']);
+        $fortalezas = $fortaleza->obtenerPorCodigo($_SESSION['plan_codigo']);
+
+        // Modo edición
+        $edicionDebilidad = isset($_GET['editarDebilidad']) && is_numeric($_GET['editarDebilidad']);
+        $edicionFortaleza = isset($_GET['editarFortaleza']) && is_numeric($_GET['editarFortaleza']);
+
+        $debilidadActual = null;
+        $fortalezaActual = null;
+
+        if ($edicionDebilidad) {
+            $debilidadActual = $debilidad->obtenerPorIdYUsuario($_GET['editarDebilidad'], $_SESSION['identity']->id);
+            if (!$debilidadActual) {
+                $_SESSION['error_bcg'] = 'No tienes permiso para editar esta debilidad';
+                $edicionDebilidad = false;
+            }
+        }
+
+        if ($edicionFortaleza) {
+            $fortalezaActual = $fortaleza->obtenerPorIdYUsuario($_GET['editarFortaleza'], $_SESSION['identity']->id);
+            if (!$fortalezaActual) {
+                $_SESSION['error_bcg'] = 'No tienes permiso para editar esta fortaleza';
+                $edicionFortaleza = false;
+            }
+        }
+        // --- FIN NUEVO ---
+
+        // Producto edición (si aplica)
         $editarProducto = isset($_GET['editar']) ? (int)$_GET['editar'] : null;
-        
-        // Obtener productos del plan actual
-        $productos = $this->producto->obtenerPorPlan(
-            $_SESSION['plan_codigo'], 
-            $_SESSION['identity']->id
-        );
-        
-        // Si estamos editando, cargar los datos de ese producto
         $productoEditar = null;
         if ($editarProducto) {
             $productoEditar = $this->producto->obtenerPorId($editarProducto, $_SESSION['identity']->id);
         }
-        
+
         require_once 'views/bcg/index.php';
     }
     
@@ -188,4 +215,170 @@ class BCGControlador {
         
         header("Location:" . base_url . "bcg/index");
     }
+
+    public function guardarDebilidad() {
+        if (!isset($_SESSION['identity']) || $_SERVER['REQUEST_METHOD'] != 'POST') {
+            $_SESSION['error_analisis'] = 'Acceso no autorizado';
+            header("Location:" . base_url . "usuario/iniciarSesion");
+            exit();
+        }
+
+        try {
+            if (!isset($_SESSION['plan_codigo'])) {
+                throw new Exception('No has seleccionado un plan activo');
+            }
+
+            $textoDebilidad = trim($_POST['debilidad'] ?? '');
+            $codigoPlan = $_SESSION['plan_codigo'];
+            $id_debilidad = $_POST['id_debilidad'] ?? null;
+
+            if (empty($textoDebilidad)) {
+                throw new Exception('La debilidad no puede estar vacía');
+            }
+
+            $debilidad = new Debilidad();
+            $debilidad->setDebilidad($textoDebilidad)
+                     ->setCodigo($codigoPlan)
+                     ->setIdUsuario($_SESSION['identity']->id);
+
+            if ($id_debilidad) {
+                // Modo edición
+                $debilidad->setIdDebilidad($id_debilidad);
+                $resultado = $debilidad->actualizar();
+                $_SESSION['debilidad_actualizada'] = $resultado ? 'completado' : 'fallido';
+            } else {
+                // Modo creación
+                $resultado = $debilidad->guardar();
+                $_SESSION['debilidad_guardada'] = $resultado ? 'completado' : 'fallido';
+            }
+
+            if (!$resultado) {
+                throw new Exception('Error al procesar la debilidad en la base de datos');
+            }
+
+        } catch (Exception $e) {
+            $_SESSION['error_analisis'] = $e->getMessage();
+            if ($id_debilidad) {
+                $_SESSION['debilidad_actualizada'] = 'fallido';
+            } else {
+                $_SESSION['debilidad_guardada'] = 'fallido';
+            }
+        }
+
+        header("Location:" . base_url . "bcg/index");
+        exit();
+    }
+
+    public function guardarFortaleza() {
+        if (!isset($_SESSION['identity']) || $_SERVER['REQUEST_METHOD'] != 'POST') {
+            $_SESSION['error_analisis'] = 'Acceso no autorizado';
+            header("Location:" . base_url . "usuario/iniciarSesion");
+            exit();
+        }
+
+        try {
+            if (!isset($_SESSION['plan_codigo'])) {
+                throw new Exception('No has seleccionado un plan activo');
+            }
+
+            $textoFortaleza = trim($_POST['fortaleza'] ?? '');
+            $codigoPlan = $_SESSION['plan_codigo'];
+            $id_fortaleza = $_POST['id_fortaleza'] ?? null;
+
+            if (empty($textoFortaleza)) {
+                throw new Exception('La fortaleza no puede estar vacía');
+            }
+
+            $fortaleza = new Fortaleza();
+            $fortaleza->setFortaleza($textoFortaleza)
+                     ->setCodigo($codigoPlan)
+                     ->setIdUsuario($_SESSION['identity']->id);
+
+            if ($id_fortaleza) {
+                // Modo edición
+                $fortaleza->setIdFortaleza($id_fortaleza);
+                $resultado = $fortaleza->actualizar();
+                $_SESSION['fortaleza_actualizada'] = $resultado ? 'completado' : 'fallido';
+            } else {
+                // Modo creación
+                $resultado = $fortaleza->guardar();
+                $_SESSION['fortaleza_guardada'] = $resultado ? 'completado' : 'fallido';
+            }
+
+            if (!$resultado) {
+                throw new Exception('Error al procesar la fortaleza en la base de datos');
+            }
+
+        } catch (Exception $e) {
+            $_SESSION['error_analisis'] = $e->getMessage();
+            if ($id_fortaleza) {
+                $_SESSION['fortaleza_actualizada'] = 'fallido';
+            } else {
+                $_SESSION['fortaleza_guardada'] = 'fallido';
+            }
+        }
+
+        header("Location:" . base_url . "bcg/index");
+        exit();
+    }
+
+    public function eliminarDebilidad() {
+        if (!isset($_SESSION['identity']) || !isset($_GET['id'])) {
+            $_SESSION['error_analisis'] = 'Acceso no autorizado';
+            header("Location:" . base_url . "usuario/iniciarSesion");
+            exit();
+        }
+
+        try {
+            $id_debilidad = (int)$_GET['id'];
+            $id_usuario = $_SESSION['identity']->id;
+
+            $debilidad = new Debilidad();
+            $debilidad->setIdDebilidad($id_debilidad)
+                     ->setIdUsuario($id_usuario);
+
+            if ($debilidad->eliminar()) {
+                $_SESSION['debilidad_eliminada'] = 'completado';
+            } else {
+                throw new Exception('Error al eliminar la debilidad');
+            }
+        } catch (Exception $e) {
+            $_SESSION['debilidad_eliminada'] = 'fallido';
+            $_SESSION['error_analisis'] = $e->getMessage();
+        }
+
+        header("Location:" . base_url . "bcg/index");
+        exit();
+    }
+
+    public function eliminarFortaleza() {
+        if (!isset($_SESSION['identity']) || !isset($_GET['id'])) {
+            $_SESSION['error_analisis'] = 'Acceso no autorizado';
+            header("Location:" . base_url . "usuario/iniciarSesion");
+            exit();
+        }
+
+        try {
+            $id_fortaleza = (int)$_GET['id'];
+            $id_usuario = $_SESSION['identity']->id;
+
+            $fortaleza = new Fortaleza();
+            $fortaleza->setIdFortaleza($id_fortaleza)
+                     ->setIdUsuario($id_usuario);
+
+            if ($fortaleza->eliminar()) {
+                $_SESSION['fortaleza_eliminada'] = 'completado';
+            } else {
+                throw new Exception('Error al eliminar la fortaleza');
+            }
+        } catch (Exception $e) {
+            $_SESSION['fortaleza_eliminada'] = 'fallido';
+            $_SESSION['error_analisis'] = $e->getMessage();
+        }
+
+        header("Location:" . base_url . "bcg/index");
+        exit();
+    }
+
 }
+
