@@ -7,32 +7,6 @@
     <link rel="stylesheet" href="<?=base_url?>assets/css/layout/lateral.css">
     <link rel="stylesheet" href="<?=base_url?>assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .selected-plan {
-            font-size: 0.9rem;
-            color: #f0f0f0;
-            margin-top: 8px;
-            padding: 5px 10px;
-            background-color: #333;
-            border-radius: 5px;
-        }
-        .text-warning {
-            color: #ffc107;
-        }
-        .btn-change-plan {
-            margin-top: 10px;
-            padding: 5px 10px;
-            font-size: 0.9rem;
-            background-color: #ff5722;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .btn-change-plan:hover {
-            background-color: #e64a19;
-        }
-    </style>
 </head>
 <body>
     <!-- BARRA LATERAL -->
@@ -52,7 +26,6 @@
                 <form action="<?=base_url?>planEstrategico/cambiar" method="POST" id="form-cambiar-plan">
                     <button type="submit" class="btn-change-plan">Cambiar Plan</button>
                 </form>
-
             <?php else: ?>
                 <div class="selected-plan text-warning">
                     <i class="fas fa-exclamation-triangle"></i>
@@ -63,25 +36,52 @@
         
         <!-- CONTENIDO DEL MENÚ -->
         <div class="menu-container">
+            <!-- Sección Principal - Dashboard primero -->
+            <div class="menu-section">
+                <h3 class="menu-title">Principal</h3>
+                <ul class="menu-list">
+                    <li class="menu-item">
+                        <a href="<?=base_url?>dashboard/index">
+                            <i class="fas fa-tachometer-alt"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="<?=base_url?>resumen/index">
+                            <i class="fas fa-chart-pie"></i>
+                            Resumen Ejecutivo
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
             <!-- Sección Fundamentos -->
             <div class="menu-section">
                 <h3 class="menu-title">Fundamentos</h3>
                 <ul class="menu-list">
                     <li class="menu-item">
-                        <i class="fas fa-bullseye"></i>
-                        <a href="<?=base_url?>mision/index">1. Misión</a>
+                        <a href="<?=base_url?>mision/index">
+                            <i class="fas fa-bullseye"></i>
+                            1. Misión
+                        </a>
                     </li>
                     <li class="menu-item">
-                        <i class="fas fa-eye"></i>
-                        <a href="<?=base_url?>vision/index">2. Visión</a>
+                        <a href="<?=base_url?>vision/index">
+                            <i class="fas fa-eye"></i>
+                            2. Visión
+                        </a>
                     </li>
                     <li class="menu-item">
-                        <i class="fas fa-gem"></i>
-                        <a href="<?=base_url?>valor/index">3. Valores</a>
+                        <a href="<?=base_url?>valor/index">
+                            <i class="fas fa-gem"></i>
+                            3. Valores
+                        </a>
                     </li>
                     <li class="menu-item">
-                        <i class="fas fa-flag-checkered"></i>
-                        <a href="<?=base_url?>plan/index">4. Objetivos</a>
+                        <a href="<?=base_url?>plan/index">
+                            <i class="fas fa-flag-checkered"></i>
+                            4. Objetivos
+                        </a>
                     </li>
                 </ul>
             </div>
@@ -91,24 +91,34 @@
                 <h3 class="menu-title">Análisis Estratégico</h3>
                 <ul class="menu-list">
                     <li class="menu-item">
-                        <i class="fas fa-search"></i>
-                        <a href="<?=base_url?>analisis/info">5. Análisis FODA</a>
+                        <a href="<?=base_url?>analisis/info">
+                            <i class="fas fa-search"></i>
+                            5. Análisis FODA
+                        </a>
                     </li>
                     <li class="menu-item">
-                        <i class="fas fa-link"></i>
-                        <a href="<?=base_url?>analisis/index">6. Cadena de Valor</a>
+                        <a href="<?=base_url?>analisis/index">
+                            <i class="fas fa-link"></i>
+                            6. Cadena de Valor
+                        </a>
                     </li>
                     <li class="menu-item">
-                        <i class="fas fa-th"></i>
-                        <a href="<?=base_url?>BCG/index">7. Matriz BCG</a>
+                        <a href="<?=base_url?>BCG/index">
+                            <i class="fas fa-th"></i>
+                            7. Matriz BCG
+                        </a>
                     </li>
                     <li class="menu-item">
-                        <i class="fas fa-chess-board"></i>
-                        <a href="<?=base_url?>porter/index">8. 5 Fuerzas Porter</a>
+                        <a href="<?=base_url?>porter/index">
+                            <i class="fas fa-chess-board"></i>
+                            8. 5 Fuerzas Porter
+                        </a>
                     </li>
                     <li class="menu-item">
-                        <i class="fas fa-globe"></i>
-                        <a href="<?=base_url?>pestel/index">9. Análisis PESTEL</a>
+                        <a href="<?=base_url?>pestel/index">
+                            <i class="fas fa-globe"></i>
+                            9. Análisis PESTEL
+                        </a>
                     </li>
                 </ul>
             </div>
@@ -118,52 +128,66 @@
                 <h3 class="menu-title">Formulación</h3>
                 <ul class="menu-list">
                     <li class="menu-item">
-                        <i class="fas fa-chess-queen"></i>
-                        <a href="<?=base_url?>foda/index">10. Estrategias</a>
+                        <a href="<?=base_url?>foda/index">
+                            <i class="fas fa-chess-queen"></i>
+                            10. Estrategias
+                        </a>
                     </li>
                     <li class="menu-item">
-                        <i class="fas fa-table"></i>
-                        <a href="<?=base_url?>came/index">11. Matriz CAME</a>
-                    </li>
-                    <li class="menu-item">
-                        <i class="fas fa-file-alt"></i>
-                        <a href="<?=base_url?>resumen/index">12. Resumen Estratégico</a>
+                        <a href="<?=base_url?>came/index">
+                            <i class="fas fa-table"></i>
+                            11. Matriz CAME
+                        </a>
                     </li>
                 </ul>
             </div>
         </div>
         
-        <!-- PIE DE PÁGINA CON USUARIO - VERSIÓN ADAPTADA -->
+        <!-- PIE DE PÁGINA CON USUARIO -->
         <div class="sidebar-footer">
-            <div class="menu-section">
-                <h3 class="menu-title">Settings</h3>
-                <ul class="menu-list">
-                    <?php if (!isset($_SESSION['identity'])): ?>
-                        <li class="menu-item">
-                            <i class="fas fa-sign-in-alt"></i>
-                            <button class="btn-login" onclick="abrirModalLogin()">Iniciar Sesión</button>
-                        </li>
-                    <?php else: ?>
-                        <li class="menu-item user-profile">
-                            <div class="user-info" onclick="toggleProfileMenu()">
-                                <i class="fas fa-user-circle"></i>
-                                <div class="user-welcome">
-                                    <span class="welcome-text">Bienvenido,</span>
-                                    <span class="user-name"><?= $_SESSION['identity']->empresa ?></span>
-                                </div>
-                                <i class="fas fa-chevron-down dropdown-arrow"></i>
-                            </div>
-                            <div class="profile-dropdown">
-                                <a href="<?= base_url ?>usuario/perfil" class="dropdown-item">
-                                    <i class="fas fa-user"></i> Mi Perfil
-                                </a>
-                                <a href="<?= base_url ?>usuario/cerrarSesion" class="dropdown-item logout">
-                                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-                                </a>
-                            </div>
-                        </li>
-                    <?php endif; ?>
-                </ul>
+            <div class="user-profile">
+                <?php if (!isset($_SESSION['identity'])): ?>
+                    <!-- Botón de login cuando no hay sesión -->
+                    <button class="user-info btn-login" onclick="abrirModalLogin()">
+                        <i class="fas fa-user-circle"></i>
+                        <div class="user-welcome">
+                            <span class="welcome-text">Inicia Sesión</span>
+                            <span class="user-name">Acceder al Sistema</span>
+                        </div>
+                        <i class="fas fa-sign-in-alt"></i>
+                    </button>
+                <?php else: ?>
+                    <!-- Información del usuario con dropdown -->
+                    <button class="user-info" onclick="toggleProfileMenu()">
+                        <i class="fas fa-user-circle"></i>
+                        <div class="user-welcome">
+                            <span class="welcome-text">Bienvenido</span>
+                            <span class="user-name"><?= $_SESSION['identity']->empresa ?? 'Usuario' ?></span>
+                        </div>
+                        <i class="fas fa-chevron-down dropdown-arrow" id="footer-arrow"></i>
+                    </button>
+                    
+                    <!-- Dropdown del usuario -->
+                    <div class="profile-dropdown" id="footer-dropdown">
+                        <a href="<?= base_url ?>usuario/perfil" class="dropdown-item">
+                            <i class="fas fa-user"></i>
+                            Mi Perfil
+                        </a>
+                        <a href="<?= base_url ?>dashboard/index" class="dropdown-item">
+                            <i class="fas fa-chart-bar"></i>
+                            Dashboard
+                        </a>
+                        <a href="<?= base_url ?>planEstrategico/cambiar" class="dropdown-item">
+                            <i class="fas fa-exchange-alt"></i>
+                            Cambiar Plan
+                        </a>
+                        <hr style="margin: 0.5rem 0; border: none; border-top: 1px solid #e5e7eb;">
+                        <a href="<?= base_url ?>usuario/cerrarSesion" class="dropdown-item logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Cerrar Sesión
+                        </a>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>

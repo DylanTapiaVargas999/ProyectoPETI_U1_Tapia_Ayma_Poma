@@ -93,7 +93,8 @@ class planEstrategicoControlador {
 
             if ($planSeleccionado) {
                 $_SESSION['plan_codigo'] = $planSeleccionado->codigo;
-                header("Location: " . base_url ); // Redirige a dashboard o página principal
+                // CAMBIAR ESTA REDIRECCIÓN
+                header("Location: " . base_url . "dashboard/index"); // Redirige al primer paso del proceso
                 exit();
             }
         }

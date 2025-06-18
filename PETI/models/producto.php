@@ -24,6 +24,7 @@ class Producto {
     private $id_usuario;
     private $db;
     private $completado;
+    private $tabla = 'producto'; // Agregado para las nuevas funciones
 
     public function __construct() {
         $this->db = Database::conexion();
@@ -278,6 +279,27 @@ class Producto {
                 AND id_usuario = {$datos['id_usuario']}";
         
         return $this->db->query($sql);
+    }
+
+    // Nuevos métodos para obtener todos los productos y contar productos
+    public function obtenerTodos($codigo_plan) {
+        $sql = "SELECT * FROM {$this->tabla} WHERE codigo_plan = '{$codigo_plan}' ORDER BY id_producto DESC";
+        $productos = $this->db->query($sql);
+        return $productos;
+    }
+
+    public function contarProductos($codigo_plan) {
+        $sql = "SELECT COUNT(*) as total FROM {$this->tabla} WHERE codigo_plan = '{$codigo_plan}'";
+        $result = $this->db->query($sql);
+        $row = $result->fetch_assoc();
+        return $row['total'];
+    }
+
+    public function contarProductosCompletos($codigo_plan) {
+        $sql = "SELECT COUNT(*) as total FROM {$this->tabla} WHERE codigo_plan = '{$codigo_plan}' AND participacion_mercado IS NOT NULL AND tasa_crecimiento IS NOT NULL";
+        $result = $this->db->query($sql);
+        $row = $result->fetch_assoc();
+        return $row['total'];
     }
 
 }

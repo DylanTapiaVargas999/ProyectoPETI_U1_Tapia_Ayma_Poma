@@ -30,7 +30,15 @@ if (!isset($_SESSION['identity']) && !in_array($pagina_actual, $paginas_publicas
 if (isset($_GET['controlador'])) {
     $nombre_controlador = $_GET['controlador'] . 'Controlador';
 } elseif (!isset($_GET['controlador']) && !isset($_GET['accion'])) {
-    $nombre_controlador = 'usuarioControlador'; // Controlador por defecto
+    if (isset($_SESSION['identity'])) {
+        // Si está logueado, redirigir a misión (primer paso)
+        $nombre_controlador = 'misionControlador';
+        $_GET['accion'] = 'index';
+    } else {
+        // Si no está logueado, mostrar login
+        $nombre_controlador = 'usuarioControlador';
+        $_GET['accion'] = 'iniciarSesion';
+    }
 } else {
     mostrar_error();
     exit();

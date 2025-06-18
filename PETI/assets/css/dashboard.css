@@ -1,0 +1,502 @@
+/* Variables CSS para consistencia */
+:root {
+    --primary-color: #6366f1;
+    --secondary-color: #8b5cf6;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --info-color: #06b6d4;
+    --light-gray: #f8fafc;
+    --medium-gray: #e2e8f0;
+    --dark-gray: #64748b;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --border-radius: 12px;
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --transition: all 0.2s ease-in-out;
+}
+
+/* Reset y base */
+.dashboard-container {
+    padding: 1.5rem;
+    background: var(--light-gray);
+    min-height: 100vh;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Header minimalista */
+.dashboard-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-md);
+}
+
+.dashboard-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+    color: white;
+    letter-spacing: -0.025em;
+}
+
+.dashboard-subtitle {
+    font-size: 1rem;
+    margin: 0.5rem 0 0 0;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 400;
+}
+
+.dashboard-date {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
+}
+
+/* Tarjeta de progreso principal */
+.progress-card {
+    background: white;
+    border: 1px solid var(--medium-gray);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+}
+
+.progress-card .card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.progress-main {
+    height: 12px;
+    background: var(--medium-gray);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.progress-main .progress-bar {
+    background: linear-gradient(90deg, var(--success-color), var(--info-color));
+    transition: width 0.6s ease;
+    border-radius: 6px;
+}
+
+.progress-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: conic-gradient(
+        var(--primary-color) 0deg,
+        var(--primary-color) calc(var(--progress, 0) * 3.6deg),
+        var(--medium-gray) calc(var(--progress, 0) * 3.6deg),
+        var(--medium-gray) 360deg
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    position: relative;
+}
+
+.progress-circle::before {
+    content: '';
+    width: 60px;
+    height: 60px;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+}
+
+.progress-text {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    z-index: 1;
+}
+
+/* Tarjetas de sección */
+.section-card {
+    background: white;
+    border: 1px solid var(--medium-gray);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    overflow: hidden;
+}
+
+.section-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.section-card .card-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--medium-gray);
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.section-card .card-body {
+    padding: 0;
+}
+
+/* Items de sección minimalistas */
+.section-item {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    transition: var(--transition);
+}
+
+.section-item:last-child {
+    border-bottom: none;
+}
+
+.section-item:hover {
+    background: var(--light-gray);
+}
+
+.section-item span {
+    font-weight: 500;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+}
+
+/* Badges mejorados */
+.badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.375rem 0.75rem;
+    border-radius: 6px;
+    text-transform: none;
+}
+
+.bg-success {
+    background-color: var(--success-color) !important;
+}
+
+.bg-warning {
+    background-color: var(--warning-color) !important;
+    color: white !important;
+}
+
+.bg-info {
+    background-color: var(--info-color) !important;
+}
+
+.bg-secondary {
+    background-color: var(--dark-gray) !important;
+}
+
+/* Botones modernos */
+.btn {
+    font-weight: 500;
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: var(--transition);
+    border: none;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8125rem;
+}
+
+.btn-outline-primary {
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    background: transparent;
+}
+
+.btn-outline-primary:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-outline-info {
+    color: var(--info-color);
+    border: 1px solid var(--info-color);
+    background: transparent;
+}
+
+.btn-outline-info:hover {
+    background: var(--info-color);
+    color: white;
+}
+
+.btn-outline-success {
+    color: var(--success-color);
+    border: 1px solid var(--success-color);
+    background: transparent;
+}
+
+.btn-outline-success:hover {
+    background: var(--success-color);
+    color: white;
+}
+
+/* Botones de acción */
+.action-btn {
+    height: 3rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: var(--transition);
+    border: none;
+    box-shadow: var(--shadow-sm);
+}
+
+.action-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-success {
+    background: var(--success-color);
+    color: white;
+}
+
+.btn-success:hover {
+    background: #059669;
+}
+
+.btn-danger {
+    background: var(--danger-color);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+}
+
+.btn-warning {
+    background: var(--warning-color);
+    color: white;
+}
+
+.btn-warning:hover {
+    background: #d97706;
+}
+
+.btn-info {
+    background: var(--info-color);
+    color: white;
+}
+
+.btn-info:hover {
+    background: #0891b2;
+}
+
+/* Alertas minimalistas */
+.alert {
+    padding: 1rem 1.25rem;
+    border-radius: var(--border-radius);
+    border: none;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+.alert-info {
+    background: rgba(6, 182, 212, 0.1);
+    color: #0891b2;
+    border-left: 4px solid var(--info-color);
+}
+
+.alert-warning {
+    background: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+    border-left: 4px solid var(--warning-color);
+}
+
+.alert-primary {
+    background: rgba(99, 102, 241, 0.1);
+    color: #4338ca;
+    border-left: 4px solid var(--primary-color);
+}
+
+.alert-success {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+    border-left: 4px solid var(--success-color);
+}
+
+/* Cards generales */
+.card {
+    background: white;
+    border: 1px solid var(--medium-gray);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+}
+
+.card-header {
+    background: white;
+    border-bottom: 1px solid var(--medium-gray);
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Headers de colores específicos */
+.bg-primary {
+    background: var(--primary-color) !important;
+    color: white !important;
+}
+
+.bg-info {
+    background: var(--info-color) !important;
+    color: white !important;
+}
+
+.bg-success {
+    background: var(--success-color) !important;
+    color: white !important;
+}
+
+.bg-light {
+    background: var(--light-gray) !important;
+    color: var(--text-primary) !important;
+    border-bottom: 1px solid var(--medium-gray);
+}
+
+/* Responsive mejorado */
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 1rem;
+    }
+    
+    .dashboard-header {
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .dashboard-title {
+        font-size: 1.5rem;
+    }
+    
+    .dashboard-subtitle {
+        font-size: 0.875rem;
+    }
+    
+    .section-item {
+        padding: 1rem;
+    }
+    
+    .action-btn {
+        margin-bottom: 0.75rem;
+        height: 2.75rem;
+        font-size: 0.8125rem;
+    }
+    
+    .progress-circle {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .progress-circle::before {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .progress-text {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .dashboard-title {
+        font-size: 1.375rem;
+    }
+    
+    .section-item span {
+        font-size: 0.8125rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .section-item {
+        padding: 0.875rem 1rem;
+    }
+}
+
+/* Animaciones sutiles */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.section-card {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.section-card:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.section-card:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+/* Estados de hover mejorados */
+.section-item .btn:hover {
+    transform: scale(1.02);
+}
+
+.badge {
+    transition: var(--transition);
+}
+
+/* Mejoras en la tipografía */
+.card-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0;
+}
+
+.text-muted {
+    color: var(--text-secondary) !important;
+}
+
+/* Espaciado consistente */
+.mb-4 {
+    margin-bottom: 2rem !important;
+}
+
+.mt-4 {
+    margin-top: 2rem !important;
+}
+
+.mt-2 {
+    margin-top: 0.5rem !important;
+}
+
+/* Focus states para accesibilidad */
+.btn:focus,
+.btn:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
